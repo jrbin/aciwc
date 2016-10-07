@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+    <meta name="" content="">
+    <meta name="author" content="junrui">
+    <link rel="icon" href="../../favicon.ico">
+
+    <title>管理平台 - 编辑</title>
+
+    <!-- Bootstrap core CSS -->
+    <link rel="stylesheet" href="css/bootstrap.min.css">
+
+    <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
+    <link href="css/ie10-viewport-bug-workaround.css" rel="stylesheet">
+
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
+      <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+    <link rel="stylesheet" type="text/css" href="css/index.css">
+  </head>
+
+  <body>
+    <div class="container">
+      <div class="row">
+        <div class="col-md-8 col-md-offset-2 col-sm-10 col-sm-offset-1">
+          <h1>编辑</h1>
+          {% if 'activity' == request.args.get('object') %}
+          <form action="/edit" method="POST">
+            <div class="input-group">
+              <input type="text" name="logo_url" class="form-control" placeholder="输入图片url或者从本地上传">
+              <span class="input-group-btn">
+                <label class="btn btn-default btn-file">
+                  选择图片... <input type="file" style="display: none;">
+                </label>
+              </span>
+            </div>
+            <textarea class="mce2" name="description" hidden></textarea>
+            <button class="btn btn-primary">保存</button>
+          </form>
+          {% else %}
+          <form action="/edit" method="POST">
+            <input type="text" name="title" class="form-control" placeholder="标题">
+            <textarea class="mce" name="html" hidden></textarea>
+            <button class="btn btn-primary">保存</button>
+          </form>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+
+    <script src="js/jquery.min.js"></script>
+    <script src="js/tinymce.min.js"></script>
+    <script src="js/edit.js"></script>
+  </body>
+</html>
