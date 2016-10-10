@@ -7,7 +7,7 @@
     <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
     <meta name="" content="">
     <meta name="author" content="junrui">
-    <link rel="icon" href="../../favicon.ico">
+    <link rel="icon" href="/img/favicon.ico">
 
     <title>欢迎访问澳大利亚国际微商总会主页</title>
 
@@ -141,6 +141,16 @@
               <h1 class="section-heading text-center">战略合作伙伴</h1>
             </div>
           </div>
+          {% for partner in partners %}
+          <div class="row partner vertical-align">
+            <div class="col-md-6 col-sm-6 partner-img">
+              <img src="{{ partner.logo_url }}" class="img-responsive center-block">
+            </div>
+            <div class="col-md-6 col-sm-6 partner-text">
+              {{ partner.html|safe }}
+            </div>
+          </div>
+          {% endfor %}
           <div class="row partner vertical-align">
             <div class="col-md-6 col-sm-6 partner-img">
               <img src="/img/641.jpeg" class="img-responsive center-block">

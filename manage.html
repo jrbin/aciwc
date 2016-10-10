@@ -7,15 +7,15 @@
     <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
     <meta name="" content="">
     <meta name="author" content="junrui">
-    <link rel="icon" href="../../favicon.ico">
+    <link rel="icon" href="/img/favicon.ico">
 
     <title>管理平台</title>
 
     <!-- Bootstrap core CSS -->
-    <link rel="stylesheet" href="css/bootstrap.min.css">
+    <link rel="stylesheet" href="/css/bootstrap.min.css">
 
     <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
-    <link href="css/ie10-viewport-bug-workaround.css" rel="stylesheet">
+    <link href="/css/ie10-viewport-bug-workaround.css" rel="stylesheet">
 
     <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
     <!--[if lt IE 9]>
@@ -23,54 +23,60 @@
       <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
     <![endif]-->
 
-    <link rel="stylesheet" type="text/css" href="css/index.css">
+    <link rel="stylesheet" type="text/css" href="/css/index.css">
   </head>
 
   <body>
     <div class="container">
       <div class="row">
-        <div class="col-md-8 col-md-offset-2 col-sm-10 col-sm-offset-1">
+        <!--<div class="col-md-8 col-md-offset-2 col-sm-10 col-sm-offset-1">-->
+        <div class="col-md-12 col-sm-12">
           <h1>管理平台</h1>
           <ul class="nav nav-tabs">
-            <li role="presentation" class="active"><a href="#">伙伴</a></li>
-            <li role="presentation"><a href="manage.html?object=activity">活动</a></li>
+            <li role="presentation" {% if entity == 'partner' %}class="active"{% endif %}><a href="/manage/partner">伙伴</a></li>
+            <li role="presentation" {% if entity == 'activity' %}class="active"{% endif %}><a href="/manage/activity">活动</a></li>
           </ul>
-          {% if 'activity' == request.args.get('object') %}
-          <a class="btn btn-primary">添加活动</a>
-          <table id="activity-table" class="table table-striped">
-            <tr>
-              <th>id</th>
-              <th>title</th>
-              <th>content</th>
-              <th>action</th>
-            </tr>
-            {% for activity in activities %}
-              <tr>
-                <td>{{ partner.id }}</td>
-                <td>{{ partner.logo_url }}</td>
-                <td>{{ partner.description }}</td>
-                <td>hide</td>
-              </tr>
-            {% endfor %}
-          </table>
-          {% else %}
-          <a class="btn btn-primary">添加伙伴</a>
+          {% if entity == 'partner' %}
           <table id="partner-table" class="table table-striped">
             <tr>
-              <th>id</th>
               <th>logo_url</th>
               <th>description</th>
               <th>action</th>
             </tr>
-            {% for partner in partners %}
+            {% for partner in items %}
               <tr>
-                <td>{{ partner.id }}</td>
                 <td>{{ partner.logo_url }}</td>
-                <td>{{ partner.description }}</td>
-                <td>hide</td>
+                <td>{{ partner.html|striptags|truncate(100) }}</td>
+                <td>
+                  <a href="/edit/partner/{{ partner.id }}" class="btn btn-default">编辑</a>
+                  <a href="" class="btn btn-default">隐藏</a>
+                  <a href="" class="btn btn-default">删除</a>
+                </td>
               </tr>
             {% endfor %}
           </table>
+          <a class="btn btn-primary" href="/edit/partner">添加伙伴</a>
+          {% endif %}
+          {% if entity == 'activity' %}
+          <table id="activity-table" class="table table-striped">
+            <tr>
+              <th>title</th>
+              <th>content</th>
+              <th>action</th>
+            </tr>
+            {% for activity in items %}
+              <tr>
+                <td>{{ activity.title }}</td>
+                <td>{{ activity.html|striptags|truncate(100) }}</td>
+                <td>
+                  <a href="/edit/activity/{{ activity.id }}" class="btn btn-default">编辑</a>
+                  <a href="" class="btn btn-default">隐藏</a>
+                  <a href="" class="btn btn-default">删除</a>
+                </td>
+              </tr>
+            {% endfor %}
+          </table>
+          <a class="btn btn-primary" href="/edit/activity">添加活动</a>
           {% endif %}
         </div>
       </div>

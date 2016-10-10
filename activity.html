@@ -7,7 +7,7 @@
     <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
     <meta name="description" content="">
     <meta name="author" content="junrui">
-    <link rel="icon" href="../../favicon.ico">
+    <link rel="icon" href="/img/favicon.ico">
 
     <title>欢迎访问澳大利亚国际微商总会主页</title>
 
@@ -111,6 +111,17 @@
           </ul>
         </div>
       </div>
+      {% for activity in activities %}
+      <div class="row activity-item">
+        <div class="col-md-3 col-sm-3">
+          <img src="{{ activity.thumbnail }}" class="img-responsive center-block activity-img">
+        </div>
+        <div class="col-md-9 col-sm-9 activity-text">
+          <h2>{{ activity.title }}</h2>
+          {{ activity.html|safe }}
+        </div>
+      </div>
+      {% endfor %}
 
       <nav aria-label="...">
         <ul class="pagination">

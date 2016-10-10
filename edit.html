@@ -7,15 +7,15 @@
     <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
     <meta name="" content="">
     <meta name="author" content="junrui">
-    <link rel="icon" href="../../favicon.ico">
+    <link rel="icon" href="/img/favicon.ico">
 
     <title>管理平台 - 编辑</title>
 
     <!-- Bootstrap core CSS -->
-    <link rel="stylesheet" href="css/bootstrap.min.css">
+    <link rel="stylesheet" href="/css/bootstrap.min.css">
 
     <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
-    <link href="css/ie10-viewport-bug-workaround.css" rel="stylesheet">
+    <link href="/css/ie10-viewport-bug-workaround.css" rel="stylesheet">
 
     <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
     <!--[if lt IE 9]>
@@ -23,40 +23,53 @@
       <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
     <![endif]-->
 
-    <link rel="stylesheet" type="text/css" href="css/index.css">
+    <link rel="stylesheet" type="text/css" href="/css/index.css">
   </head>
 
   <body>
     <div class="container">
       <div class="row">
         <div class="col-md-8 col-md-offset-2 col-sm-10 col-sm-offset-1">
-          <h1>编辑</h1>
-          {% if 'activity' == request.args.get('object') %}
-          <form action="/edit" method="POST">
+          {% if entity == 'partner' %}
+          <div class="row">
+            <div class="col-md-12 col-sm-12">
+              <h1 class="inline-header">编辑</h1>
+              <h3 class="inline-header"> - 伙伴</h3>
+              <a href="/manage/{{ entity }}">返回管理平台</a>
+            </div>
+          </div>
+          <form method="POST">
+            <textarea class="mce" name="html" hidden></textarea>
+            <img id="logo-img" class="img-responsive" src="{{ item.logo_url }}">
             <div class="input-group">
-              <input type="text" name="logo_url" class="form-control" placeholder="输入图片url或者从本地上传">
+              <input type="text" name="logo_url" class="form-control" placeholder="Logo, 输入图片url或者从本地上传" value="{{ item.logo_url }}" required>
               <span class="input-group-btn">
-                <label class="btn btn-default btn-file">
-                  选择图片... <input type="file" style="display: none;">
-                </label>
+                <label id="img-upload-label" class="btn btn-default btn-file">选择图片... </label>
               </span>
             </div>
-            <textarea class="mce2" name="description" hidden></textarea>
             <button class="btn btn-primary">保存</button>
           </form>
-          {% else %}
-          <form action="/edit" method="POST">
-            <input type="text" name="title" class="form-control" placeholder="标题">
+          {% endif %}
+          {% if entity == 'activity' %}
+          <form method="POST">
+            <input type="text" name="title" class="form-control" value="{{ item.title }}" placeholder="标题" required>
             <textarea class="mce" name="html" hidden></textarea>
             <button class="btn btn-primary">保存</button>
           </form>
           {% endif %}
+          <form id="img-upload-form" action="/upload" method="post" enctype="multipart/form-data" hidden>
+              <input id="img-upload-btn" name="image" type="file">
+          </form>
         </div>
       </div>
     </div>
 
-    <script src="js/jquery.min.js"></script>
-    <script src="js/tinymce.min.js"></script>
-    <script src="js/edit.js"></script>
+    <div id="mce-initial-content" hidden>
+      {{item.html|safe}}
+    </div>
+
+    <script src="/js/jquery.min.js"></script>
+    <script src="/js/tinymce.min.js"></script>
+    <script src="/js/edit.js"></script>
   </body>
 </html>
