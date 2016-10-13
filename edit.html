@@ -30,14 +30,16 @@
     <div class="container">
       <div class="row">
         <div class="col-md-8 col-md-offset-2 col-sm-10 col-sm-offset-1">
-          {% if entity == 'partner' %}
           <div class="row">
             <div class="col-md-12 col-sm-12">
               <h1 class="inline-header">编辑</h1>
-              <h3 class="inline-header"> - 伙伴</h3>
+              <h3 class="inline-header"> -
+                {% if entity == 'partner' %}伙伴{% elif entity == 'activity' %}活动{% endif %}
+              </h3>
               <a href="/manage/{{ entity }}">返回管理平台</a>
             </div>
           </div>
+          {% if entity == 'partner' %}
           <form method="POST">
             <textarea class="mce" name="html" hidden></textarea>
             <img id="logo-img" class="img-responsive" src="{{ item.logo_url }}">

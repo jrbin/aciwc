@@ -33,24 +33,26 @@
         <div class="col-md-12 col-sm-12">
           <h1>管理平台</h1>
           <ul class="nav nav-tabs">
-            <li role="presentation" {% if entity == 'partner' %}class="active"{% endif %}><a href="/manage/partner">伙伴</a></li>
-            <li role="presentation" {% if entity == 'activity' %}class="active"{% endif %}><a href="/manage/activity">活动</a></li>
+            <li role="presentation" class="{% if entity == 'partner' %}active{% endif %}"><a href="/manage/partner">伙伴</a></li>
+            <li role="presentation" class="{% if entity == 'activity' %}active{% endif %}"><a href="/manage/activity">活动</a></li>
           </ul>
           {% if entity == 'partner' %}
           <table id="partner-table" class="table table-striped">
             <tr>
-              <th>logo_url</th>
-              <th>description</th>
-              <th>action</th>
+              <th class="col-logo">logo</th>
+              <th class="col-description">description</th>
+              <th class="col-action">action</th>
             </tr>
             {% for partner in items %}
               <tr>
-                <td>{{ partner.logo_url }}</td>
-                <td>{{ partner.html|striptags|truncate(100) }}</td>
+                <td><img src="{{ partner.logo_url }}" class="manage-img"></td>
+                <td>{{ partner.html|striptags|truncate(100, True) }}</td>
                 <td>
                   <a href="/edit/partner/{{ partner.id }}" class="btn btn-default">编辑</a>
-                  <a href="" class="btn btn-default">隐藏</a>
-                  <a href="" class="btn btn-default">删除</a>
+                  <a href="/toggle/partner/{{ partner.id }}" class="btn btn-default {% if partner.hidden %}btn-warning{% endif %}">
+                    {% if partner.hidden %}显示{% else %}隐藏{% endif %}
+                  </a>
+                  <a href="/remove/partner/{{ partner.id }}" class="btn btn-default">删除</a>
                 </td>
               </tr>
             {% endfor %}
@@ -60,18 +62,20 @@
           {% if entity == 'activity' %}
           <table id="activity-table" class="table table-striped">
             <tr>
-              <th>title</th>
+              <th class="col-title">title</th>
               <th>content</th>
-              <th>action</th>
+              <th class="col-action">action</th>
             </tr>
             {% for activity in items %}
               <tr>
-                <td>{{ activity.title }}</td>
+                <td><a href="/activity/{{ activity.id }}">{{ activity.title }}</a></td>
                 <td>{{ activity.html|striptags|truncate(100) }}</td>
                 <td>
                   <a href="/edit/activity/{{ activity.id }}" class="btn btn-default">编辑</a>
-                  <a href="" class="btn btn-default">隐藏</a>
-                  <a href="" class="btn btn-default">删除</a>
+                  <a href="/toggle/activity/{{ activity.id }}" class="btn btn-default {% if activity.hidden %}btn-warning{% endif %}">
+                    {% if activity.hidden %}显示{% else %}隐藏{% endif %}
+                  </a>
+                  <a href="/remove/activity/{{ activity.id }}" class="btn btn-default">删除</a>
                 </td>
               </tr>
             {% endfor %}

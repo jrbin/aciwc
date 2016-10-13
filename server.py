@@ -7,7 +7,8 @@ from bs4 import BeautifulSoup
 
 from db import insert_activity, update_activity, select_activity_all,\
     insert_partner, update_partner, select_partner_all, select_partner_by_id,\
-    select_activity_by_id
+    select_activity_by_id, toggle_partner, toggle_activity, remove_activity, \
+    remove_partner
 
 ALLOWED_EXTENSIONS = set(['png', 'jpg', 'jpeg', 'gif'])
 
@@ -21,10 +22,15 @@ def root():
     return render_template('index.html', partners=partners)
 
 
-@app.route("/activity")
-def activity():
-    activities = select_activity_all()
-    return render_template('activity.html', activities=activities)
+@app.route("/activity/")
+@app.route("/activity/<int:activity_id>")
+def activity(activity_id=None):
+    if activity_id is None:
+        activities = select_activity_all()
+        return render_template('activity.html', activities=activities)
+
+    act = select_activity_by_id(activity_id)
+    return render_template('activity_detail.html', activity=act)
 
 
 @app.route("/img/<path:path>")
@@ -42,13 +48,14 @@ def send_js(path):
     return send_from_directory('js', path)
 
 
+@app.route("/manage/")
 @app.route("/manage/<entity>")
-def manage(entity: str):
+def manage(entity='partner'):
     items = None
     if entity == 'partner':
-        items = select_partner_all()
+        items = select_partner_all(hidden=None)
     if entity == 'activity':
-        items = select_activity_all()
+        items = select_activity_all(hidden=None)
     return render_template('manage.html', entity=entity, items=items)
 
 
@@ -114,6 +121,24 @@ def upload():
         file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
         return url_for('send_img', path=filename)
     return 'file extension not allowed', 400
+
+
+@app.route("/toggle/<entity>/<int:entity_id>")
+def hide(entity: str, entity_id: int):
+    if entity == 'partner':
+        toggle_partner(entity_id)
+    if entity == 'activity':
+        toggle_activity(entity_id)
+    return redirect(url_for('manage', entity=entity))
+
+
+@app.route("/remove/<entity>/<int:entity_id>")
+def remove(entity: str, entity_id: int):
+    if entity == 'partner':
+        remove_partner(entity_id)
+    if entity == 'activity':
+        remove_activity(entity_id)
+    return redirect(url_for('manage', entity=entity))
 
 
 if __name__ == "__main__":
