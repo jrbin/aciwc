@@ -1,0 +1,21 @@
+img.manage-img {
+    max-width: 240px;
+    max-height: 120px;
+}
+
+th.col-logo {
+    width: 240px;
+}
+
+th.col-action {
+    width: 200px;
+}
+
+th.col-title {
+    width: 25%;
+}
+
+img.hero-img {
+    max-width: 360px;
+    max-height: 180px;
+}

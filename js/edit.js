@@ -58,4 +58,9 @@ $(function () {
     $('input[name="logo_url"]').on('change', function(e) {
         $('#logo-img').attr('src', $(this).val());
     });
+
+    $('#datetimepicker1').datetimepicker({
+        format: 'YYYY-MM-DD HH:mm',
+    });
+
 });

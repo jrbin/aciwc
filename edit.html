@@ -23,7 +23,9 @@
       <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
     <![endif]-->
 
-    <link rel="stylesheet" type="text/css" href="/css/index.css">
+    <link rel="stylesheet" type="text/css" href="/css/bootstrap-datetimepicker.min.css">
+    <link rel="stylesheet" type="text/css" href="/css/public.css">
+    <link rel="stylesheet" type="text/css" href="/css/edit.css">
   </head>
 
   <body>
@@ -55,6 +57,7 @@
           {% if entity == 'activity' %}
           <form method="POST">
             <input type="text" name="title" class="form-control" value="{{ item.title }}" placeholder="标题" required>
+            <input id="datetimepicker1" type="text" name="activity_time" class="form-control" {% if item is not none %}value="{{ item.activity_time.strftime('%Y-%m-%d %H:%M') }}"{% endif %} placeholder="活动时间" required>
             <textarea class="mce" name="html" hidden></textarea>
             <button class="btn btn-primary">保存</button>
           </form>
@@ -72,6 +75,8 @@
 
     <script src="/js/jquery.min.js"></script>
     <script src="/js/tinymce.min.js"></script>
+    <script src="/js/moment.min.js"></script>
+    <script src="/js/bootstrap-datetimepicker.min.js"></script>
     <script src="/js/edit.js"></script>
   </body>
 </html>

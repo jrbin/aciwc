@@ -4,3 +4,4 @@
 *.pyo
 env
 aciwc.db
+config.yml

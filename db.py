@@ -1,10 +1,15 @@
 from datetime import datetime
+import yaml
 
 from sqlalchemy import create_engine, Table, Column, Integer, String, \
     MetaData, DateTime, Boolean
 from sqlalchemy.sql import select, text
 
-engine = create_engine('sqlite:///aciwc.db', echo=True)
+
+with open("config.yml", 'r') as config_file:
+    cfg = yaml.load(config_file)
+
+engine = create_engine('sqlite:///' + cfg['sqlite']['db'], echo=True)
 
 metadata = MetaData()
 
@@ -25,10 +30,18 @@ activity = Table(
     Column('title', String, nullable=False),
     Column('html', String, nullable=False),
     Column('thumbnail', String),
+    Column('activity_time', DateTime, nullable=False),
     Column('published_time', DateTime, nullable=False, default=datetime.now()),
     Column('modified_time', DateTime, nullable=False, default=datetime.now(),
            onupdate=datetime.now()),
     Column('hidden', Boolean, nullable=False, default=False)
+)
+
+hero = Table(
+    'hero', metadata,
+    Column('id', Integer, primary_key=True),
+    Column('image_url', String, nullable=False),
+    Column('description', String, nullable=True),
 )
 
 metadata.create_all(engine)
@@ -72,9 +85,10 @@ def remove_partner(partner_id: int):
     conn.execute(stmt)
 
 
-def insert_activity(title: str, html: str, thumbnail: str):
+def insert_activity(title: str, html: str, thumbnail: str, activity_time: str):
     conn = engine.connect()
-    conn.execute(activity.insert(), title=title, html=html, thumbnail=thumbnail)
+    conn.execute(activity.insert(), title=title, html=html, thumbnail=thumbnail,
+                 activity_time=activity_time)
 
 
 def select_activity_all(hidden=False):
@@ -108,4 +122,21 @@ def toggle_activity(activity_id: int):
 def remove_activity(activity_id: int):
     conn = engine.connect()
     stmt = activity.delete().where(activity.c.id == activity_id)
+    conn.execute(stmt)
+
+
+def insert_hero(image_url: str, description: str):
+    conn = engine.connect()
+    conn.execute(hero.insert(), image_url=image_url, description=description)
+
+
+def select_hero_all():
+    conn = engine.connect()
+    stmt = select([hero])
+    return conn.execute(stmt).fetchall()
+
+
+def remove_hero(hero_id: int):
+    conn = engine.connect()
+    stmt = hero.delete().where(hero.c.id == hero_id)
     conn.execute(stmt)

@@ -1,0 +1,73 @@
+/* 要注意表单元素并不继承父级 font 的问题 */
+body, button, input, select, textarea {
+  font-weight: 400;
+  font-family: PingFang SC, Lantinghei SC, Microsoft Yahei, Hiragino Sans GB, Microsoft Sans Serif, WenQuanYi Micro Hei, sans;
+  -webkit-font-smoothing: antialiased;
+}
+
+.container-below-nav {
+    padding-top: 50px;
+}
+
+ul {
+    padding-left: 20px;
+}
+
+h1, h2, h3 {
+    font-weight: 200;
+}
+
+img {
+    height: auto;
+    border-radius: 4px;
+}
+
+@media (min-width: 768px) {
+
+    .vertical-align {
+        display: flex;
+        align-items: center;
+    }
+}
+
+.navbar-default {
+    background-color: #fff;
+}
+
+.navbar a {
+    border-bottom: 0;
+}
+
+.navbar ul.nav {
+    margin: 0;
+}
+
+.form-control {
+    border-radius: 0;
+}
+
+h1 a, h2 a, h3 a, h4 a, h5 a, h6 a {
+    color: inherit;
+}
+
+h1 a:hover, h2 a:hover, h3 a:hover, h4 a:hover, h5 a:hover, h6 a:hover {
+    text-decoration: none;
+}
+
+h1 a:focus, h2 a:focus, h3 a:focus, h4 a:focus, h5 a:focus, h6 a:focus {
+    text-decoration: none;
+}
+
+.nav-logo {
+    float: left;
+    height: 50px;
+}
+
+#nav-bg-right {
+    position: absolute;
+    top: 0;
+    right: 0;
+    background-image: url('/img/navright.png');
+    height: 50px;
+    width: 160px;
+}

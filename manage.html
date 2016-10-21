@@ -23,7 +23,8 @@
       <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
     <![endif]-->
 
-    <link rel="stylesheet" type="text/css" href="/css/index.css">
+    <link rel="stylesheet" type="text/css" href="/css/public.css">
+    <link rel="stylesheet" type="text/css" href="/css/manage.css">
   </head>
 
   <body>
@@ -33,9 +34,42 @@
         <div class="col-md-12 col-sm-12">
           <h1>管理平台</h1>
           <ul class="nav nav-tabs">
+            <li role="presentation" class="{% if entity == 'hero' %}active{% endif %}"><a href="/manage/hero">首页滚动图片</a></li>
             <li role="presentation" class="{% if entity == 'partner' %}active{% endif %}"><a href="/manage/partner">伙伴</a></li>
             <li role="presentation" class="{% if entity == 'activity' %}active{% endif %}"><a href="/manage/activity">活动</a></li>
           </ul>
+          {% if entity == 'hero' %}
+          <table id="hero-table" class="table table-striped">
+            <tr>
+              <th>image</th>
+              <th class="col-action">description</th>
+              <th class="col-action">size</th>
+              <th class="col-action">action</th>
+            </tr>
+            {% for hero in items %}
+              <tr>
+                <td><img src="{{ hero.image_url }}" class="hero-img"></td>
+                <td>{{ hero.description }}</td>
+                <td class="img-size"></td>
+                <td><a href="/remove/hero/{{ hero.id }}" class="btn btn-default">删除</a></td>
+              </tr>
+            {% endfor %}
+          </table>
+          <form id="add-hero-form" method="POST">
+            <div class="input-group">
+              <span class="input-group-btn">
+                <button id="choose-image" type="button" class="btn btn-primary">选择图片</button>
+              </span>
+              <input type="text" name="image_url" class="form-control" placeholder="选择图片，或者添加url" required>
+              <span class="input-group-btn" style="width:0px;"></span>
+              <input type="text" name="description" class="form-control" placeholder="图片描述(可选)">
+            </div>
+            <button type="submit" class="btn btn-primary">添加</button>
+          </form>
+          <form method="post" enctype="multipart/form-data" hidden>
+            <input id="img-upload-btn" name="image" type="file">
+          </form>
+          {% endif %}
           {% if entity == 'partner' %}
           <table id="partner-table" class="table table-striped">
             <tr>
@@ -85,5 +119,8 @@
         </div>
       </div>
     </div>
+
+    <script src="/js/jquery.min.js"></script>
+    <script src="/js/manage.js"></script>
   </body>
 </html>

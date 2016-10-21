@@ -26,17 +26,19 @@
       <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
     <![endif]-->
 
-    <link rel="stylesheet" type="text/css" href="/css/index.css">
+    <link rel="stylesheet" type="text/css" href="/css/public.css">
+    <link rel="stylesheet" type="text/css" href="/css/activity.css">
+    <link rel="stylesheet" type="text/css" href="/css/loader.css">
   </head>
 
   <body>
-
+<!--
     <div id="loader-wrapper">
       <img id="loader-img" src="/img/logo.png">
       <div id="loader"></div>
       <div class="loader-section section-left"></div>
       <div class="loader-section section-right"></div>
-    </div>
+    </div>-->
 
     <!-- Fixed navbar -->
     <nav class="navbar navbar-default navbar-fixed-top">
@@ -54,24 +56,85 @@
           <ul class="nav navbar-nav">
             <li><a href="/">首页</a></li>
             <li class="active"><a href="">活动</a></li>
+            <li><a href="/contact">联系我们</a></li>
           </ul>
         </div><!--/.nav-collapse -->
       </div>
     </nav>
 
-    <div class="container activity-container">
-      {% for activity in activities %}
-      <div class="row activity-item">
-        <div class="col-md-3 col-sm-3">
-          <img src="{{ activity.thumbnail }}" class="img-responsive center-block activity-img">
-        </div>
-        <div class="col-md-9 col-sm-9 activity-text">
-          <h2><a href="{{ activity.id }}" target="_blank">{{ activity.title }}</a></h2>
-          <p>发布时间：{{ activity.published_time.strftime('%Y-%m-%d %H:%M') }}</p>
-          <p>{{ activity.html|striptags|truncate(200, True) }}</p>
-        </div>
+    <div class="container container-below-nav">
+
+      <h2 id="timeline">近期活动</h2>
+      {% if not activities %}
+      <div class="alert alert-warning" role="alert">
+        暂时没有新活动。我们的活动即将上线，您也可以<a href="/contact">联系我们</a>咨询活动详情。
       </div>
-      {% endfor %}
+      {% else %}
+      <ul class="timeline">
+        {% for activity in activities %}
+        <li>
+          <div class="timeline-datetime">
+            <span>{{ activity.activity_time.strftime('%Y-%m-%d') }}</span>
+            <span>{{ activity.activity_time.strftime('%H:%M') }}</span>
+          </div>
+          <div class="timeline-badge click-effect"><i class="glyphicon glyphicon-unchecked"></i></div>
+          <div class="timeline-panel">
+            <div class="row">
+              <div class="col-md-9">
+                <div class="timeline-heading">
+                  <h3 class="timeline-title"><a href="{{ activity.id }}" target="_blank">{{ activity.title }}</a></h3>
+                  <!--<p><small class="text-muted"><i class="glyphicon glyphicon-time"></i> 11 hours ago via Twitter</small></p>-->
+                </div>
+                <div class="timeline-datetime2">
+                  活动时间: {{ activity.activity_time.strftime('%Y-%m-%d %H:%M') }}
+                </div>
+                <div class="timeline-body">
+                  <p>{{ activity.html|striptags|truncate(200, True) }}</p>
+                </div>
+              </div>
+              <div class="col-md-3">
+                <img src="{% if activity.thumbnail is not none %}{{ activity.thumbnail }}{% else %}/img/logo.png{% endif %}" class="timeline-img">
+              </div>
+            </div>
+          </div>
+        </li>
+        {% endfor %}
+      </ul>
+      {% endif %}
+
+      <div id="old-activity">
+        <button id="toggle-button" class="btn btn-lg btn-primary">查看往期活动</button>
+        <ul id="old-activity-list" class="timeline" hidden>
+        {% for activity in old_activities %}
+        <li>
+          <div class="timeline-datetime">
+            <span>{{ activity.activity_time.strftime('%Y-%m-%d') }}</span>
+            <span>{{ activity.activity_time.strftime('%H:%M') }}</span>
+          </div>
+          <div class="timeline-badge"><i class="glyphicon glyphicon-check"></i></div>
+          <div class="timeline-panel">
+            <div class="row">
+              <div class="col-md-9">
+                <div class="timeline-heading">
+                  <h3 class="timeline-title"><a href="{{ activity.id }}" target="_blank">{{ activity.title }}</a></h3>
+                  <!--<p><small class="text-muted"><i class="glyphicon glyphicon-time"></i> 11 hours ago via Twitter</small></p>-->
+                </div>
+                <div class="timeline-datetime2">
+                  活动时间: {{ activity.activity_time.strftime('%Y-%m-%d %H:%M') }}
+                </div>
+                <div class="timeline-body">
+                  <p>{{ activity.html|striptags|truncate(200, True) }}</p>
+                </div>
+              </div>
+              <div class="col-md-3">
+                <img src="{{ activity.thumbnail }}" class="timeline-img">
+              </div>
+            </div>
+          </div>
+        </li>
+        {% endfor %}
+        </ul>
+      </div>
 
       <!--
       <nav aria-label="...">
@@ -89,27 +152,13 @@
 
     </div>
 
-    
+
     <footer class="footer">
-      <div class="container">
-        <div class="row vertical-align">
-          <div class="col-md-4 col-sm-4 text-muted">
-            <p>澳大利亚国际微商总会</p>
-            <p>ACIWC</p>
-          </div>
-          <div class="col-md-4 col-sm-4 text-muted">
-            <p>电话</p>
-            <ul>
-              <li>02 8277 8877</li>
-              <li>02 8297 8899</li>
-            </ul>
-            <p>Email</p>
-            <ul>
-              <li>aciwc@etel.com.au</li>
-            </ul>
-          </div>
-          <div class="col-md-4 col-sm-4">
-            <img src="/img/0.jpeg" width="160">
+      <div class="container vertical-align">
+        <div class="row">
+          <div class="col-md-12 col-sm-12">
+            <strong>友情链接</strong>
+            <p>友情链接1 | 友情链接2 | 友情链接3</p>
           </div>
         </div>
       </div>
@@ -122,6 +171,7 @@
     <script src="/js/bootstrap.min.js"></script>
     <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
     <script src="/js/ie10-viewport-bug-workaround.js"></script>
+    <script src="/js/activity.js"></script>
     <script src="/js/loader.js"></script>
   </body>
 </html>
