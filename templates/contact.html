@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+
+{% set page = 3 %}
+
+{% block title %}联系我们{% endblock %}
+
+{% block css %}
+    <link rel="stylesheet" type="text/css" href="/css/contact.css">
+{% endblock %}
+
+{% block content %}
+    <div class="container container-below-nav">
+      <div class="contact-outer">
+          <div class="contact-form">
+            <h3>发送消息</h3>
+            <p>您的反馈将会以邮件形式发送至我们的邮箱</p>
+            <form id="contact-form" method="POST">
+              <div class="form-group">
+                <input id="contact-email" class="form-control" type="email" name="email" placeholder="联系邮箱" required>
+              </div>
+              <div class="form-group">
+                <input id="contact-phone" class="form-control" type="tel" name="phone" placeholder="联系电话（可选）">
+              </div>
+              <div class="form-group">
+                <input id="contact-org" class="form-control" type="text" name="organization" placeholder="公司（可选）">
+              </div>
+              <div class="form-group">
+                <textarea id="contact-content" class="form-control" name="content" rows="16" required></textarea>
+              </div>
+              <div id="hint-success" class="alert alert-success" role="alert" hidden>
+                您的反馈已成功发送，我们将及时回复您
+              </div>
+              <div id="hint-failure" class="alert alert-success" role="alert" hidden>
+                未发送成功，您可以尝试直接给我们发邮件
+              </div>
+              <button type="submit" class="btn btn-default">提交</button>
+            </form>
+          </div>
+          <div class="contact-panel">
+            <div class="panel panel-default">
+              <div class="panel-heading">
+                <h3 class="panel-title">联系方式</h3>
+              </div>
+              <div class="panel-body">
+                <p>澳大利亚国际微商总会<br>ACIWC</p>
+                <h5>电话</h5>
+                <p>02 8277 8877</p>
+                <p>02 8297 8899</p>
+                <h5>Email</h5>
+                <p>aciwc@etel.com.au</p>
+                <h5>微信</h5>
+                <img src="/img/0.jpeg" width="160">
+              </div>
+            </div>
+          </div>
+      </div>
+    </div>
+{% endblock %}
+
+{% block script %}
+    <script src="/js/contact.js"></script>
+{% endblock %}

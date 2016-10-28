@@ -44,6 +44,21 @@ hero = Table(
     Column('description', String, nullable=True),
 )
 
+link = Table(
+    'link', metadata,
+    Column('id', Integer, primary_key=True),
+    Column('name', String, nullable=False),
+    Column('url', String, nullable=False),
+)
+
+misc = Table(
+    'misc', metadata,
+    Column('id', Integer, primary_key=True),
+    Column('key', String, nullable=False, unique=True),
+    Column('value', String, nullable=False),
+)
+
+
 metadata.create_all(engine)
 
 
@@ -139,4 +154,37 @@ def select_hero_all():
 def remove_hero(hero_id: int):
     conn = engine.connect()
     stmt = hero.delete().where(hero.c.id == hero_id)
+    conn.execute(stmt)
+
+
+def select_link_all():
+    conn = engine.connect()
+    stmt = select([link])
+    return conn.execute(stmt).fetchall()
+
+
+def remove_link(link_id: int):
+    conn = engine.connect()
+    stmt = link.delete().where(link.c.id == link_id)
+    conn.execute(stmt)
+
+
+def insert_link(name: str, url: str):
+    conn = engine.connect()
+    conn.execute(link.insert(), name=name, url=url)
+
+
+def get_misc(key: str):
+    conn = engine.connect()
+    stmt = select([misc]).where(misc.c.key == key)
+    item = conn.execute(stmt).fetchone()
+    if item:
+        return item['value']
+    conn.execute(misc.insert(), key=key, value='')
+    return ''
+
+
+def set_misc(key: str, value: str):
+    conn = engine.connect()
+    stmt = misc.update().values(dict(value=value)).where(misc.c.key == key)
     conn.execute(stmt)

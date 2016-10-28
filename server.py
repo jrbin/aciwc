@@ -16,15 +16,28 @@ with open("config.yml", 'r') as config_file:
 
 ALLOWED_EXTENSIONS = set(['png', 'jpg', 'jpeg', 'gif'])
 
-app = Flask(__name__, static_url_path='', template_folder='')
+# app = Flask(__name__, static_url_path='', template_folder='')
+app = Flask(__name__)
 app.config['UPLOAD_FOLDER'] = 'img/'
 
 
 @app.route('/')
 def root():
     partners = select_partner_all()
+    introduction = None
+    for item in partners:
+        if item.id == 1:
+            introduction = item
+    partners = [item for item in partners if item.id != 1]
     heroes = select_hero_all()
-    return render_template('index.html', partners=partners, heroes=heroes)
+    links = select_link_all()
+    return render_template('index.html', partners=partners, heroes=heroes,
+                           introduction=introduction, links=links)
+
+
+@app.route('/<folder>/<path:path>')
+def send_img(folder, path):
+    return send_from_directory('static/' + folder, path)
 
 
 @app.route("/activity/")
@@ -44,11 +57,6 @@ def activity(activity_id=None):
     return render_template('activity_detail.html', activity=act)
 
 
-@app.route("/<folder>/<path:filename>")
-def send_img(folder, filename):
-    return send_from_directory(folder, filename)
-
-
 @app.route("/manage/", methods=["GET", "POST"])
 @app.route("/manage/<entity>", methods=["GET", "POST"])
 def manage(entity='partner'):
@@ -60,13 +68,27 @@ def manage(entity='partner'):
             items = select_partner_all(hidden=None)
         if entity == 'activity':
             items = select_activity_all(hidden=None)
+        if entity == 'link':
+            items = select_link_all()
+        if entity == 'email':
+            items = get_misc('email')
         return render_template('manage.html', entity=entity, items=items)
 
     if entity == 'hero':
         image_url = request.form['image_url']
         description = request.form['description']
         insert_hero(image_url, description)
-        return redirect(url_for('manage', entity=entity))
+    elif entity == 'link':
+        name = request.form['name']
+        url = request.form['url']
+        insert_link(name, url)
+    elif entity == 'email':
+        email = request.form['email']
+        set_misc('email', email)
+    else:
+        return '', 400
+
+    return redirect(url_for('manage', entity=entity))
 
 
 @app.route("/edit/<entity>/", methods=["GET", "POST"])
@@ -160,12 +182,12 @@ def contact():
     return render_template('contact.html')
 
 
-def send_email(email: str, subject: str, content: str):
+def send_email(fr: str, to: list or tuple, subject: str, content: str):
     return requests.post(
         cfg['mailgun']['api_url'],
         auth=("api", cfg['mailgun']['api_key']),
-        data={"from": "noreply <mailgun@chenjr.cc>",
-              "to": [email],
+        data={"from": fr,
+              "to": to,
               "subject": subject,
               "text": content})
 
@@ -176,11 +198,13 @@ def send():
     content = request.form["content"].strip()
     phone = request.form["phone"].strip()
     organization = request.form['organization'].strip()
+    content += '\n\n------\nemail: ' + email
     if phone:
-        content += '\n\n电话: ' + phone
+        content += '\n电话: ' + phone
     if organization:
-        content += '\n\n公司: ' + organization
-    r = send_email(email, '网站反馈', content)
+        content += '\n公司: ' + organization
+    to = (get_misc('email'),)
+    r = send_email(email, to, '网站反馈', content)
     if r.status_code >= 400:
         return r.text, r.status_code
     return r.text

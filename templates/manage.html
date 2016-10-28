@@ -37,6 +37,8 @@
             <li role="presentation" class="{% if entity == 'hero' %}active{% endif %}"><a href="/manage/hero">首页滚动图片</a></li>
             <li role="presentation" class="{% if entity == 'partner' %}active{% endif %}"><a href="/manage/partner">伙伴</a></li>
             <li role="presentation" class="{% if entity == 'activity' %}active{% endif %}"><a href="/manage/activity">活动</a></li>
+            <li role="presentation" class="{% if entity == 'link' %}active{% endif %}"><a href="/manage/link">友情链接</a></li>
+            <li role="presentation" class="{% if entity == 'email' %}active{% endif %}"><a href="/manage/email">公司邮件</a></li>
           </ul>
           {% if entity == 'hero' %}
           <table id="hero-table" class="table table-striped">
@@ -83,10 +85,12 @@
                 <td>{{ partner.html|striptags|truncate(100, True) }}</td>
                 <td>
                   <a href="/edit/partner/{{ partner.id }}" class="btn btn-default">编辑</a>
+                  {% if partner.id > 1 %}
                   <a href="/toggle/partner/{{ partner.id }}" class="btn btn-default {% if partner.hidden %}btn-warning{% endif %}">
                     {% if partner.hidden %}显示{% else %}隐藏{% endif %}
                   </a>
                   <a href="/remove/partner/{{ partner.id }}" class="btn btn-default">删除</a>
+                  {% endif %}
                 </td>
               </tr>
             {% endfor %}
@@ -115,6 +119,42 @@
             {% endfor %}
           </table>
           <a class="btn btn-primary" href="/edit/activity">添加活动</a>
+          {% endif %}
+          {% if entity == 'link' %}
+          <table id="link-table" class="table table-striped">
+            <tr>
+              <th>链接名称</th>
+              <th>链接地址</th>
+              <th class="col-action">action</th>
+            </tr>
+            {% for link in items %}
+              <tr>
+                <td>{{ link.name }}</td>
+                <td><a href="{{ link.url }}">{{ link.url }}</a></td>
+                <td><a href="/remove/link/{{ link.id }}" class="btn btn-default">删除</a></td>
+              </tr>
+            {% endfor %}
+          </table>
+          <form id="add-link-form" method="POST">
+            <div class="input-group">
+              <input type="text" name="name" class="form-control" placeholder="链接名称" required>
+              <span class="input-group-btn" style="width:0px;"></span>
+              <input type="text" name="url" class="form-control" placeholder="链接地址" required>
+              <span class="input-group-btn">
+                <button type="submit" class="btn btn-primary">添加</button>
+              </span>
+            </div>
+          </form>
+          {% endif %}
+          {% if entity == 'email' %}
+          <form method="POST">
+            <div class="input-group">
+              <input type="email" name="email" class="form-control" placeholder="公司邮箱地址" value="{{ items }}" required>
+              <span class="input-group-btn">
+                <button type="submit" class="btn btn-primary">更改</button>
+              </span>
+            </div>
+          </form>
           {% endif %}
         </div>
       </div>
