@@ -39,11 +39,6 @@ def root():
                            introduction=introduction, links=links)
 
 
-@app.route('/test')
-def test():
-    return render_template('test.html')
-
-
 @app.route('/<folder>/<path:path>')
 def send_img(folder, path):
     return send_from_directory('static/' + folder, path)
