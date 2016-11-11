@@ -38,6 +38,7 @@
                 <div class="timeline-body">
                   <p>{{ activity.html|striptags|truncate(200, True) }}</p>
                 </div>
+                <a href="/contact" class="btn btn-info">咨询活动详情</a>
               </div>
               <div class="col-md-3">
                 <img src="{% if activity.thumbnail is not none %}{{ activity.thumbnail }}{% else %}/img/logo.png{% endif %}" class="timeline-img">

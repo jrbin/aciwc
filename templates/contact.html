@@ -5,6 +5,7 @@
 {% block title %}联系我们{% endblock %}
 
 {% block css %}
+    <link rel="stylesheet" type="text/css" href="/css/sliptcha.css">
     <link rel="stylesheet" type="text/css" href="/css/contact.css">
 {% endblock %}
 
@@ -26,6 +27,32 @@
               </div>
               <div class="form-group">
                 <textarea id="contact-content" class="form-control" name="content" rows="16" required></textarea>
+              </div>
+              <div class="form-group">
+                <input type="text" name="sliptcha_token" required hidden>
+                <div class="slider-bar">
+                  <div class="slider-left"></div>
+                  <div class="slider-text">向右拖动滑块</div>
+                  <div class="slider-piece">
+                    <span class="slider-text-right">&gt;&gt;</span>
+                    <div class="slider-loading nc-loading-circle" style="display:none;">
+                      <div class="sk-circle1 sk-circle"></div>
+                      <div class="sk-circle2 sk-circle"></div>
+                      <div class="sk-circle3 sk-circle"></div>
+                      <div class="sk-circle4 sk-circle"></div>
+                      <div class="sk-circle5 sk-circle"></div>
+                      <div class="sk-circle6 sk-circle"></div>
+                      <div class="sk-circle7 sk-circle"></div>
+                      <div class="sk-circle8 sk-circle"></div>
+                      <div class="sk-circle9 sk-circle"></div>
+                      <div class="sk-circle10 sk-circle"></div>
+                      <div class="sk-circle11 sk-circle"></div>
+                      <div class="sk-circle12 sk-circle"></div>
+                    </div>
+                    <span class="slider-done" hidden>✓</span>
+                    <span class="slider-failed" hidden>✗</span>
+                  </div>
+                </div>
               </div>
               <div id="hint-success" class="alert alert-success" role="alert" hidden>
                 您的反馈已成功发送，我们将及时回复您
@@ -58,5 +85,7 @@
 {% endblock %}
 
 {% block script %}
+    <script src="/js/jquery-ui.min.js"></script>
+    <script src="/js/sliptcha.js"></script>
     <script src="/js/contact.js"></script>
 {% endblock %}

@@ -17,6 +17,13 @@ $(function() {
             console.log(response);
             hintSuccess.show().delay(5000).fadeOut();
             thisForm[0].reset();
+            $('.slider-piece').css({ left: 0 });
+            $('.slider-left').css({ width: 0 });
+            $('.slider-text').text('向右拖动滑块');
+            $('.slider-text-right').show();
+            $('.slider-loading').hide();
+            $('.slider-done').hide();
+            $('.slider-failed').hide();
         })
         .fail(function(xhr, textStatus) {
             hintFailure.show().delay(5000).fadeOut();
@@ -26,4 +33,5 @@ $(function() {
             formBtn.text('提交');
         });
     });
+
 });

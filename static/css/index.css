@@ -144,8 +144,10 @@ section#whole {
 
 section {
     position: relative;
-    border-top: 1px solid #e0e5e6;
-    border-bottom: 1px solid #e0e5e6;
+}
+
+#intro-section, #course-section, #partner-section {
+    border-top: 2px solid #e0e5e6;
 }
 
 .section-grey:before {

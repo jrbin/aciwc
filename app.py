@@ -1,7 +1,10 @@
 import os
+import math
+import random
+import string
 
-from flask import Flask, send_from_directory, render_template, request, flash,\
-    redirect, url_for
+from flask import Flask, send_from_directory, render_template, request, \
+    redirect, url_for, session
 from werkzeug.utils import secure_filename
 from bs4 import BeautifulSoup
 import requests
@@ -19,6 +22,7 @@ ALLOWED_EXTENSIONS = set(['png', 'jpg', 'jpeg', 'gif'])
 # app = Flask(__name__, static_url_path='', template_folder='')
 app = Flask(__name__)
 app.config['UPLOAD_FOLDER'] = 'img/'
+app.secret_key = cfg['flask']['session_key']
 
 
 @app.route('/')
@@ -35,6 +39,11 @@ def root():
                            introduction=introduction, links=links)
 
 
+@app.route('/test')
+def test():
+    return render_template('test.html')
+
+
 @app.route('/<folder>/<path:path>')
 def send_img(folder, path):
     return send_from_directory('static/' + folder, path)
@@ -49,9 +58,11 @@ def activity(activity_id=None):
         old_activities = [item for item in activities
                           if item.activity_time < now]
         activities = [item for item in activities if item.activity_time >= now]
+        links = select_link_all()
         return render_template('activity.html',
                                activities=activities,
-                               old_activities=old_activities)
+                               old_activities=old_activities,
+                               links=links)
 
     act = select_activity_by_id(activity_id)
     return render_template('activity_detail.html', activity=act)
@@ -174,6 +185,8 @@ def remove(entity: str, entity_id: int):
         remove_activity(entity_id)
     if entity == 'hero':
         remove_hero(entity_id)
+    if entity == 'link':
+        remove_link(entity_id)
     return redirect(url_for('manage', entity=entity))
 
 
@@ -194,6 +207,12 @@ def send_email(fr: str, to: list or tuple, subject: str, content: str):
 
 @app.route("/send", methods=["POST"])
 def send():
+    sliptcha_token = request.form['sliptcha_token']
+    if sliptcha_token == session['sliptcha_token']:
+        session.pop('sliptcha_token', None)
+    else:
+        return '验证码错误', 400
+
     email = request.form["email"].strip()
     content = request.form["content"].strip()
     phone = request.form["phone"].strip()
@@ -208,6 +227,37 @@ def send():
     if r.status_code >= 400:
         return r.text, r.status_code
     return r.text
+
+
+def random_string(size=10, chars=string.ascii_uppercase + string.digits):
+    return ''.join(random.SystemRandom().choice(chars) for _ in range(size))
+
+
+@app.route("/sliptcha", methods=["POST"])
+def sliptcha():
+    positions = request.json
+    print(positions)
+    if len(positions) < 10:
+        return ""
+
+    threshold = 20
+    if len(positions) >= 2 * threshold:
+        step = len(positions) // threshold
+        positions = [positions[i * step] for i in range(threshold)]
+
+    diffs = [positions[i+1] - positions[i] for i in range(len(positions) - 1)]
+    mean = sum(diffs) / len(diffs)
+    deviation = math.sqrt(
+        sum([math.pow(mean - diff, 2) for diff in diffs])
+        / (len(diffs) - 1)
+    )
+
+    if deviation <= 2:
+        return ""
+
+    sliptcha_token = random_string()
+    session['sliptcha_token'] = sliptcha_token
+    return sliptcha_token
 
 
 if __name__ == "__main__":
