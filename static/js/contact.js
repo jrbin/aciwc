@@ -24,6 +24,7 @@ $(function() {
             $('.slider-loading').hide();
             $('.slider-done').hide();
             $('.slider-failed').hide();
+            $('.slider-piece').draggable('enable');
         })
         .fail(function(xhr, textStatus) {
             hintFailure.show().delay(5000).fadeOut();

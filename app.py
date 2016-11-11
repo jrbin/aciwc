@@ -2,9 +2,10 @@ import os
 import math
 import random
 import string
+import functools
 
 from flask import Flask, send_from_directory, render_template, request, \
-    redirect, url_for, session
+    redirect, url_for, session, Response
 from werkzeug.utils import secure_filename
 from bs4 import BeautifulSoup
 import requests
@@ -23,6 +24,32 @@ ALLOWED_EXTENSIONS = set(['png', 'jpg', 'jpeg', 'gif'])
 app = Flask(__name__)
 app.config['UPLOAD_FOLDER'] = 'img/'
 app.secret_key = cfg['flask']['session_key']
+
+
+def check_auth(username, password):
+    """This function is called to check if a username /
+    password combination is valid.
+    """
+    return (username == cfg['admin']['username']
+            and password == cfg['admin']['password'])
+
+
+def authenticate():
+    """Sends a 401 response that enables basic auth"""
+    return Response(
+        'Could not verify your access level for that URL.\n'
+        'You have to login with proper credentials', 401,
+        {'WWW-Authenticate': 'Basic realm="Login Required"'})
+
+
+def requires_auth(f):
+    @functools.wraps(f)
+    def decorated(*args, **kwargs):
+        auth = request.authorization
+        if not auth or not check_auth(auth.username, auth.password):
+            return authenticate()
+        return f(*args, **kwargs)
+    return decorated
 
 
 @app.route('/')
@@ -65,6 +92,7 @@ def activity(activity_id=None):
 
 @app.route("/manage/", methods=["GET", "POST"])
 @app.route("/manage/<entity>", methods=["GET", "POST"])
+@requires_auth
 def manage(entity='partner'):
     if request.method == "GET":
         items = None
@@ -99,6 +127,7 @@ def manage(entity='partner'):
 
 @app.route("/edit/<entity>/", methods=["GET", "POST"])
 @app.route("/edit/<entity>/<int:entity_id>", methods=["GET", "POST"])
+@requires_auth
 def edit(entity: str, entity_id: int = None):
 
     if request.method == "GET":
@@ -147,6 +176,7 @@ def allowed_file(filename):
 
 
 @app.route("/upload", methods=["POST"])
+@requires_auth
 def upload():
     # check if the post request has the file part
     if 'image' not in request.files:
@@ -164,6 +194,7 @@ def upload():
 
 
 @app.route("/toggle/<entity>/<int:entity_id>")
+@requires_auth
 def hide(entity: str, entity_id: int):
     if entity == 'partner':
         toggle_partner(entity_id)
@@ -173,6 +204,7 @@ def hide(entity: str, entity_id: int):
 
 
 @app.route("/remove/<entity>/<int:entity_id>")
+@requires_auth
 def remove(entity: str, entity_id: int):
     if entity == 'partner':
         remove_partner(entity_id)
@@ -187,7 +219,8 @@ def remove(entity: str, entity_id: int):
 
 @app.route("/contact")
 def contact():
-    return render_template('contact.html')
+    links = select_link_all()
+    return render_template('contact.html', links=links)
 
 
 def send_email(fr: str, to: list or tuple, subject: str, content: str):
@@ -231,7 +264,6 @@ def random_string(size=10, chars=string.ascii_uppercase + string.digits):
 @app.route("/sliptcha", methods=["POST"])
 def sliptcha():
     positions = request.json
-    print(positions)
     if len(positions) < 10:
         return ""
 

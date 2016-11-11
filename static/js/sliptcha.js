@@ -13,7 +13,6 @@
 
         var maxPos = thisSliderBar.width() - thisSliderPiece.width()
                    - 2 * parseInt(thisSliderBar.css('border-width'));
-        console.log(maxPos);
         var positions = [];
 
         thisSliderPiece.draggable({
@@ -37,7 +36,6 @@
             },
             stop: function(event, ui) {
                 var pos = ui.position.left;
-                console.log(positions);
                 if (0 < pos && pos < maxPos) {
                     // move the piece back to start
                     thisSliderPiece.animate({ left: 0 }, slidingTime);
@@ -71,7 +69,6 @@
         });
 
         function sliptchaCheck(data) {
-            console.log(data);
             if (data) {
                 sliderPieceText('done');
                 textBackground.text('验证成功');
@@ -85,8 +82,7 @@
             var oldText = textBackground.text();
             var oldColor = thisSliderLeft.css('background-color');
             textBackground.text(errorText);
-            thisSliderLeft.animate({'background-color': 'red'}, 100);
-            //thisSliderLeft.css({'background-color': 'red'});
+            thisSliderLeft.animate({'background-color': '#F08080'}, 100);
             sliderPieceText('fail');
             thisSliderPiece.draggable('disable');
             setTimeout(function() {
@@ -132,39 +128,5 @@
             sliderPiece('right');
         }
     });
-
-//    $('.slider-piece').draggable({
-//        cursor: 'move',
-//        containment: "parent",
-//        drag: function(event, ui) {
-//            positions.push(ui.position.left);
-//            $('.slider-left').css('width', ui.position.left);
-//
-//            if (ui.position.left >= 241) {
-//                $(this).draggable('disable');
-//                $(this).unbind('mousedown');
-//                $(document).unbind('mouseup');
-//                $(this).css('left', 241);
-//                $('.slider-left').css('width', 241);
-//                return false;
-//            }
-//        },
-//    });
-//
-//    $('.slider-piece').mousedown(function() {
-//        var sliderPiece = $(this);
-//        $(document).one('mouseup', function() {
-//            var time = 500;
-//            if (parseInt(sliderPiece.css('left')) > 0)
-//                sliderPiece.animate({
-//                    left: 0,
-//                }, time);
-//            var sliderLeft = $('.slider-left');
-//            if (parseInt(sliderLeft.css('width')) > 0)
-//                sliderLeft.animate({
-//                    width: 0,
-//                }, time);
-//        });
-//    });
 
 })(jQuery);

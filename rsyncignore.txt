@@ -1,0 +1,9 @@
+.*
+*.pyc
+*.pyo
+__pycache__
+env
+*.db
+*.sqlite3
+deploy.sh
+rsyncignore.txt
