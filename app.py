@@ -3,6 +3,7 @@ import math
 import random
 import string
 import functools
+from datetime import timedelta
 
 from flask import Flask, send_from_directory, render_template, request, \
     redirect, url_for, session, Response
@@ -10,7 +11,6 @@ from werkzeug.utils import secure_filename
 from bs4 import BeautifulSoup
 import requests
 from dateutil.parser import parse
-import yaml
 
 from db import *
 
@@ -18,6 +18,8 @@ from db import *
 with open("config.yml", 'r') as config_file:
     cfg = yaml.load(config_file)
 
+ACCESS_RECORD = dict()
+ACCESS_THRESHOLD = 5
 ALLOWED_EXTENSIONS = set(['png', 'jpg', 'jpeg', 'gif'])
 
 # app = Flask(__name__, static_url_path='', template_folder='')
@@ -233,13 +235,35 @@ def send_email(fr: str, to: list or tuple, subject: str, content: str):
               "text": content})
 
 
+def check_ip_frequency(ip):
+    access_list = ACCESS_RECORD.get(ip, [])
+    access_list.sort()
+    now = datetime.now()
+    hour_ago = now - timedelta(hours=1)
+    access_list = [access_time for access_time in access_list
+                   if access_time >= hour_ago]
+    if len(access_list) >= ACCESS_THRESHOLD:
+        ACCESS_RECORD[ip] = access_list
+        return False
+
+    access_list.append(now)
+    ACCESS_RECORD[ip] = access_list
+    return True
+
+
 @app.route("/send", methods=["POST"])
 def send():
     sliptcha_token = request.form['sliptcha_token']
-    if sliptcha_token == session['sliptcha_token']:
+    session_token = session.get('sliptcha_token')
+    if session_token and sliptcha_token == session_token:
         session.pop('sliptcha_token', None)
     else:
         return '验证码错误', 400
+
+    client_ip = request.environ.get('HTTP_X_REAL_IP', request.remote_addr)
+    if not check_ip_frequency(client_ip):
+        return '访问过于频繁', 400
+    return 'haha'
 
     email = request.form["email"].strip()
     content = request.form["content"].strip()

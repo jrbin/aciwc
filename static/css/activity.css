@@ -234,3 +234,14 @@ ul.timeline > li > .timeline-panel {
 #toggle-button {
     margin-bottom: 20px;
 }
+
+@media (max-width: 991px) {
+
+    .btn-query {
+        margin-bottom: 15px;
+    }
+
+    .btn-query-container {
+        text-align: center;
+    }
+}

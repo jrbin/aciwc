@@ -4,6 +4,7 @@
     border: solid 1px #eee;
     width: 283px;
     background-color: #e8e8e8;
+    max-width: 100%;
 }
 
 .slider-piece {

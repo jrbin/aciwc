@@ -15,7 +15,7 @@
           <div class="contact-form">
             <h3>发送消息</h3>
             <p>您的反馈将会以邮件形式发送至我们的邮箱</p>
-            <form id="contact-form" method="POST">
+            <form id="contact-form" method="POST" action="/send">
               <div class="form-group">
                 <input id="contact-email" class="form-control" type="email" name="email" placeholder="联系邮箱" required>
               </div>
@@ -57,7 +57,7 @@
               <div id="hint-success" class="alert alert-success" role="alert" hidden>
                 您的反馈已成功发送，我们将及时回复您
               </div>
-              <div id="hint-failure" class="alert alert-success" role="alert" hidden>
+              <div id="hint-failure" class="alert alert-warning" role="alert" hidden>
                 未发送成功，您可以尝试直接给我们发邮件
               </div>
               <button type="submit" class="btn btn-default">提交</button>
@@ -86,6 +86,7 @@
 
 {% block script %}
     <script src="/js/jquery-ui.min.js"></script>
+    <script src="/js/jquery.ui.touch-punch.min.js"></script>
     <script src="/js/sliptcha.js"></script>
     <script src="/js/contact.js"></script>
 {% endblock %}
