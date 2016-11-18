@@ -1,0 +1,25 @@
+.top {
+    display: flex;
+    align-items: center;
+    height: 80px;
+}
+
+.top h1 {
+    margin: 0;
+    font-size: 2rem;
+}
+
+.form-wrapper {
+    max-width: 600px;
+    margin-bottom: 1.5rem;
+    padding: 1.5rem;
+    border: .2rem solid #f7f7f9;
+}
+
+.form-wrapper .input-group {
+    margin-bottom: .75rem;
+}
+
+.form-wrapper label.btn {
+    margin-bottom: 0;
+}

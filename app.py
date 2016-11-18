@@ -11,8 +11,11 @@ from werkzeug.utils import secure_filename
 from bs4 import BeautifulSoup
 import requests
 from dateutil.parser import parse
+from sqlalchemy import func
+from sqlalchemy.orm import joinedload
 
 from db import *
+from pgdb import Session, Person, Organization
 
 
 with open("config.yml", 'r') as config_file:
@@ -20,7 +23,7 @@ with open("config.yml", 'r') as config_file:
 
 ACCESS_RECORD = dict()
 ACCESS_THRESHOLD = 5
-ALLOWED_EXTENSIONS = set(['png', 'jpg', 'jpeg', 'gif'])
+ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
 
 # app = Flask(__name__, static_url_path='', template_folder='')
 app = Flask(__name__)
@@ -263,7 +266,6 @@ def send():
     client_ip = request.environ.get('HTTP_X_REAL_IP', request.remote_addr)
     if not check_ip_frequency(client_ip):
         return '访问过于频繁', 400
-    return 'haha'
 
     email = request.form["email"].strip()
     content = request.form["content"].strip()
@@ -309,6 +311,119 @@ def sliptcha():
     sliptcha_token = random_string()
     session['sliptcha_token'] = sliptcha_token
     return sliptcha_token
+
+
+def get_or_create(db_session, model, **kwargs):
+    instance = db_session.query(model).filter_by(**kwargs).first()
+    if instance:
+        return instance
+    else:
+        instance = model(**kwargs)
+        db_session.add(instance)
+        return instance
+
+
+@app.route('/person', methods=['GET', 'POST', 'PUT'])
+@requires_auth
+def person():
+    db = Session()
+    if request.method == 'POST':
+        name = request.form['name'].strip()
+        email = request.form['email'].strip()
+        organization = request.form['organization'].strip()
+        organization = get_or_create(db, Organization, name=organization)
+        birthday = request.form['birthday'].strip()
+        if 'sendingEmail' in request.form:
+            sending_email = True
+        else:
+            sending_email = False
+        person_obj = Person(
+            name=name, email=email, birthday=birthday,
+            organization=organization, sending_email=sending_email)
+        db.add(person_obj)
+        db.commit()
+        return redirect(url_for('person', action='add'))
+    elif request.method == 'PUT':
+        pass
+
+    action = request.args.get('action', 'list')
+    if action == 'list':
+        name = request.args.get('name')
+        email = request.args.get('email')
+        organization = request.args.get('organization')
+        date_from = request.args.get('dateFrom')
+        date_to = request.args.get('dateTo')
+        page = int(request.args.get('page', 1))
+        num = int(request.args.get('num', 10))
+        count = db.query(func.count(Person.id)).scalar()
+        total_pages = (count + num - 1) // num
+        page = min(total_pages, max(1, page))
+        pages = 10
+        left = page - pages // 2
+        right = page + (pages - 1) // 2
+        if left < 0:
+            left = 1
+            right = min(total_pages, left + pages - 1)
+        elif right > total_pages:
+            right = total_pages
+            left = max(1, right - pages + 1)
+        offset = (page - 1) * num
+        query = db.query(Person).options(joinedload(Person.organization))\
+            .limit(num).offset(offset)
+        if name:
+            query.filter(Person.name.like('%{}%'.format(name)))
+        if email:
+            query.filter(Person.email == email)
+        if organization:
+            query.filter(Person.organization.like('%{}%'.format(organization)))
+        if date_from and date_to:
+            query.filter(Person.birthday.between(date_from, date_to))
+        people = query.all()
+        return render_template('person.html', people=people, page=page, num=num,
+                               count=count, total_pages=total_pages, left=left,
+                               right=right, action=action)
+    else:
+        return render_template('person.html', action=action)
+
+
+@app.route('/person/batch', methods=['POST'])
+@requires_auth
+def person_batch():
+    file = request.files['file']
+    db = Session()
+    col_dict = {
+        'name': 0,
+        'email': 1,
+        'organization': 2,
+        'birthday': 3,
+    }
+    people = []
+    line = file.readline().strip().decode()
+    values = line.split(',')
+    if len(values) > 0 and values[0] in col_dict:
+        for i, val in enumerate(values):
+            val = val.strip().lower()
+            col_dict[val] = i
+    else:
+        file.seek(0)
+
+    for line in file.readlines():
+        line = line.strip().decode()
+        if not line:
+            continue
+        values = line.split(',')
+        name = values[col_dict['name']].strip()
+        email = values[col_dict['email']].strip()
+        organization = values[col_dict['organization']].strip()
+        organization = get_or_create(db, Organization, name=organization)
+        birthday = values[col_dict['birthday']].strip()
+        person_obj = Person(
+            name=name, email=email, birthday=birthday,
+            organization=organization, sending_email=True)
+        people.append(person_obj)
+    db.add_all(people)
+    db.commit()
+    return redirect(url_for('person'))
 
 
 if __name__ == "__main__":

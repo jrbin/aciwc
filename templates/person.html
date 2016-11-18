@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="icon" href="/img/favicon.png">
+    <link rel="stylesheet" href="/css/bootstrap-flex.min.css">
+    <link rel="stylesheet" href="/css/ie10-viewport-bug-workaround.css">
+    <link rel="stylesheet" href="/css/jquery-ui.min.css">
+    <link rel="stylesheet" href="/css/person.css">
+</head>
+<body>
+    <div class="container">
+        <div class="top">
+            <h1>客户信息录入系统</h1>
+            <ul class="nav nav-pills">
+                <li class="nav-item"><a class="nav-link {% if not action or action == 'list' %}active{% endif %}" href="?action=list">列表</a></li>
+                <li class="nav-item"><a class="nav-link {% if action == 'add' %}active{% endif %}" href="?action=add">添加</a></li>
+            </ul>
+        </div>
+
+        {% if not action or action == 'list' %}
+        <div class="search-bar">
+            <form class="form-inline">
+                <input type="text" class="form-control" name="keyword">
+                <select class="form-control" name="type">
+                    <option>Name</option>
+                </select>
+                <button class="form-control btn btn-secondary">搜索</button>
+            </form>
+        </div>
+        <div class="result-table">
+            <table class="table table-striped">
+                <tr>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Organization</th>
+                    <th>Birthday</th>
+                    <th>Sending Email</th>
+                    <th>Action</th>
+                </tr>
+                {% for person in people %}
+                <tr>
+                    <td>{{ person.name }}</td>
+                    <td>{{ person.email }}</td>
+                    <td>{{ person.organization.name }}</td>
+                    <td>{{ person.birthday.strftime('%Y-%m-%d') }}</td>
+                    <td>{{ person.sending_email }}</td>
+                    <td></td>
+                </tr>
+                {% endfor %}
+            </table>
+        </div>
+
+        <nav aria-label="...">
+            <ul class="pagination">
+                <li class="page-item {% if page == 1 %}disabled{% endif %}">
+                    <a class="page-link" href="{{ url_for('person', action=action, page=page-1, num=num) }}" tabindex="-1" aria-label="Previous">
+                        <span aria-hidden="true">&lt;</span>
+                        <span class="sr-only">Previous</span>
+                    </a>
+                </li>
+                {% for i in range(left, right + 1) %}
+                    {% if i == page %}
+                    <li class="page-item active"><a class="page-link" href="{{ url_for('person', action=action, page=i, num=num) }}">{{ i }} <span class="sr-only">(current)</span></a></li>
+                    {% else %}
+                    <li class="page-item"><a class="page-link" href="{{ url_for('person', action=action, page=i, num=num) }}">{{ i }}</a></li>
+                    {% endif %}
+                {% endfor %}
+                <li class="page-item {% if page == total_pages %}disabled{% endif %}">
+                    <a class="page-link" href="{{ url_for('person', action=action, page=page+1, num=num) }}" aria-label="Next">
+                        <span aria-hidden="true">&gt;</span>
+                        <span class="sr-only">Next</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+
+        {% elif action == 'add' %}
+        <div class="form-wrapper">
+            <form method="POST">
+                <div class="form-group"><input type="text" class="form-control" name="name" placeholder="Name" required></div>
+                <div class="form-group"><input type="email" class="form-control" name="email" placeholder="Email" required></div>
+                <div class="form-group"><input type="text" class="form-control" name="organization" placeholder="Organization" required></div>
+                <div class="form-group"><input type="text" class="form-control datepicker" name="birthday" placeholder="Birthday" required></div>
+                <div class="form-check">
+                    <label class="form-check-label">
+                        <input type="checkbox" class="form-check-input" name="sendingEmail" checked>
+                        Sending Birthday Email
+                    </label>
+                </div>
+                <button class="btn btn-primary">提交</button>
+            </form>
+        </div>
+        <div class="form-wrapper">
+            <p><strong>批量添加</strong>(.csv)</p>
+            <form action="/person/batch" method="POST" enctype="multipart/form-data">
+                <div class="input-group">
+                    <input type="text" class="form-control filename" readonly>
+                    <span class="input-group-btn">
+                        <label class="btn btn-primary">
+                            Browse&hellip; <input type="file" name="file" style="display: none;">
+                        </label>
+                    </span>
+                </div>
+                <button class="btn btn-primary">上传</button>
+            </form>
+        </div>
+        {% endif %}
+
+    </div>
+
+    <script src="/js/jquery.min.js"></script>
+    <script src="/js/jquery-ui.min.js"></script>
+    <script>
+        (function($) {
+            $('.datepicker').datepicker({
+                dateFormat: 'yy-mm-dd',
+                changeMonth: true,
+                changeYear: true,
+                yearRange: "-100:+0", 
+            })
+
+            $(':file').on('change', function() {
+                var filename = $(this)[0].files.length > 0 ? $(this)[0].files[0].name : '';
+                $(this).closest('form').find('.filename').val(filename);
+            });
+        }) (jQuery);
+    </script>
+</body>
+</html>

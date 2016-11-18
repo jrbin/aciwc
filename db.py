@@ -1,6 +1,6 @@
 from datetime import datetime
-import yaml
 
+import yaml
 from sqlalchemy import create_engine, Table, Column, Integer, String, \
     MetaData, DateTime, Boolean
 from sqlalchemy.sql import select, text
