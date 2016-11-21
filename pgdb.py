@@ -8,6 +8,7 @@ from sqlalchemy.ext.declarative import declarative_base
 
 
 Base = declarative_base()
+Base.to_dict = lambda self: {c.name: getattr(self, c.name) for c in self.__table__.columns}
 
 
 class Person(Base):

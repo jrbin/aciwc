@@ -3,16 +3,18 @@ import math
 import random
 import string
 import functools
-from datetime import timedelta
+from datetime import datetime, date, timedelta
 
 from flask import Flask, send_from_directory, render_template, request, \
-    redirect, url_for, session, Response
+    redirect, url_for, session, Response, jsonify
 from werkzeug.utils import secure_filename
 from bs4 import BeautifulSoup
 import requests
 from dateutil.parser import parse
-from sqlalchemy import func
+from sqlalchemy import extract
 from sqlalchemy.orm import joinedload
+from apscheduler.schedulers.background import BackgroundScheduler
+from apscheduler.schedulers.gevent import GeventScheduler
 
 from db import *
 from pgdb import Session, Person, Organization
@@ -29,6 +31,9 @@ ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
 app = Flask(__name__)
 app.config['UPLOAD_FOLDER'] = 'img/'
 app.secret_key = cfg['flask']['session_key']
+
+APP_ROOT = os.path.dirname(os.path.abspath(__file__))
+APP_TEMPLATE = os.path.join(APP_ROOT, 'templates')
 
 
 def check_auth(username, password):
@@ -228,14 +233,15 @@ def contact():
     return render_template('contact.html', links=links)
 
 
-def send_email(fr: str, to: list or tuple, subject: str, content: str):
+def send_email(to: list or tuple, subject: str, text: str, fr=cfg['mailgun']['default_smtp_login'], html=False):
+    if html:
+        data = {"from": fr, "to": to, "subject": subject, "html": text}
+    else:
+        data = {"from": fr, "to": to, "subject": subject, "text": text}
     return requests.post(
         cfg['mailgun']['api_url'],
         auth=("api", cfg['mailgun']['api_key']),
-        data={"from": fr,
-              "to": to,
-              "subject": subject,
-              "text": content})
+        data=data)
 
 
 def check_ip_frequency(ip):
@@ -277,7 +283,7 @@ def send():
     if organization:
         content += '\n公司: ' + organization
     to = (get_misc('email'),)
-    r = send_email(email, to, '网站反馈', content)
+    r = send_email(to, '网站反馈', content, email)
     if r.status_code >= 400:
         return r.text, r.status_code
     return r.text
@@ -323,7 +329,7 @@ def get_or_create(db_session, model, **kwargs):
         return instance
 
 
-@app.route('/person', methods=['GET', 'POST', 'PUT'])
+@app.route('/person', methods=['GET', 'POST'])
 @requires_auth
 def person():
     db = Session()
@@ -343,9 +349,8 @@ def person():
         db.add(person_obj)
         db.commit()
         return redirect(url_for('person', action='add'))
-    elif request.method == 'PUT':
-        pass
 
+    # GET
     action = request.args.get('action', 'list')
     if action == 'list':
         name = request.args.get('name')
@@ -355,75 +360,134 @@ def person():
         date_to = request.args.get('dateTo')
         page = int(request.args.get('page', 1))
         num = int(request.args.get('num', 10))
-        count = db.query(func.count(Person.id)).scalar()
+
+        query = db.query(Person).options(joinedload(Person.organization))
+        if name:
+            query = query.filter(Person.name.ilike('%{}%'.format(name)))
+        if email:
+            query = query.filter(Person.email == email)
+        if organization:
+            query = query.filter(Person.organization.ilike('%{}%'.format(organization)))
+        if date_from and date_to:
+            query = query.filter(Person.birthday.between(date_from, date_to))
+
+        count = query.count()
         total_pages = (count + num - 1) // num
-        page = min(total_pages, max(1, page))
+        total_pages = max(1, total_pages)
+        page = max(1, min(total_pages, page))
         pages = 10
         left = page - pages // 2
         right = page + (pages - 1) // 2
-        if left < 0:
+        if left < 1:
             left = 1
             right = min(total_pages, left + pages - 1)
         elif right > total_pages:
             right = total_pages
             left = max(1, right - pages + 1)
         offset = (page - 1) * num
-        query = db.query(Person).options(joinedload(Person.organization))\
-            .limit(num).offset(offset)
-        if name:
-            query.filter(Person.name.like('%{}%'.format(name)))
-        if email:
-            query.filter(Person.email == email)
-        if organization:
-            query.filter(Person.organization.like('%{}%'.format(organization)))
-        if date_from and date_to:
-            query.filter(Person.birthday.between(date_from, date_to))
-        people = query.all()
+
+        people = query.order_by(Person.id.desc()).limit(num).offset(offset).all()
         return render_template('person.html', people=people, page=page, num=num,
                                count=count, total_pages=total_pages, left=left,
-                               right=right, action=action)
+                               right=right, action=action, name=name, email=email,
+                               organization=organization, dateFrom=date_from, dateTo=date_to)
     else:
         return render_template('person.html', action=action)
 
 
-@app.route('/person/batch', methods=['POST'])
+@app.route('/person/<int:person_id>', methods=['PUT', 'DELETE'])
+@requires_auth
+def person_single(person_id=None):
+    db = Session()
+
+    if request.method == 'PUT':
+        person_obj = db.query(Person).filter(Person.id == person_id).first()
+        data = None
+        if 'name' in request.form:
+            data = person_obj.name = request.form['name']
+        if 'email' in request.form:
+            data = person_obj.email = request.form['email']
+        if 'organization' in request.form:
+            person_obj.organization = get_or_create(db, Organization, name=request.form['organization'].strip())
+            data = person_obj.organization.name
+        if 'birthday' in request.form:
+            data = person_obj.birthday = request.form['birthday']
+        if 'sendingEmail' in request.form:
+            data = person_obj.sending_email = request.form['sendingEmail']
+        db.commit()
+        return data
+
+    if request.method == 'DELETE':
+        db.query(Person).filter(Person.id == person_id).delete(synchronize_session=False)
+        db.commit()
+        return ''
+
+
+@app.route('/batch', methods=['POST'])
 @requires_auth
 def person_batch():
     file = request.files['file']
-    db = Session()
-    col_dict = {
-        'name': 0,
-        'email': 1,
-        'organization': 2,
-        'birthday': 3,
-    }
-    people = []
-    line = file.readline().strip().decode()
-    values = line.split(',')
-    if len(values) > 0 and values[0] in col_dict:
-        for i, val in enumerate(values):
-            val = val.strip().lower()
-            col_dict[val] = i
-    else:
-        file.seek(0)
+    target = request.form['target']
+    action = request.form['action']
 
-    for line in file.readlines():
-        line = line.strip().decode()
-        if not line:
-            continue
+    db = Session()
+
+    if target == 'person' and action == 'insert':
+        col_dict = {
+            'name': 0,
+            'email': 1,
+            'organization': 2,
+            'birthday': 3,
+        }
+        people = []
+        line = file.readline().strip().decode()
         values = line.split(',')
-        name = values[col_dict['name']].strip()
-        email = values[col_dict['email']].strip()
-        organization = values[col_dict['organization']].strip()
-        organization = get_or_create(db, Organization, name=organization)
-        birthday = values[col_dict['birthday']].strip()
-        person_obj = Person(
-            name=name, email=email, birthday=birthday,
-            organization=organization, sending_email=True)
-        people.append(person_obj)
-    db.add_all(people)
-    db.commit()
-    return redirect(url_for('person'))
+        if len(values) > 0 and values[0] in col_dict:
+            for i, val in enumerate(values):
+                val = val.strip().lower()
+                col_dict[val] = i
+        else:
+            file.seek(0)
+
+        for line in file.readlines():
+            line = line.strip().decode()
+            if not line:
+                continue
+            values = line.split(',')
+            name = values[col_dict['name']].strip()
+            email = values[col_dict['email']].strip()
+            organization = values[col_dict['organization']].strip()
+            organization = get_or_create(db, Organization, name=organization)
+            birthday = values[col_dict['birthday']].strip()
+            person_obj = Person(
+                name=name, email=email, birthday=birthday,
+                organization=organization, sending_email=True)
+            people.append(person_obj)
+        db.add_all(people)
+        db.commit()
+        return redirect(url_for('person'))
+
+
+def send_birthday_email():
+    db = Session()
+    with open(os.path.join(APP_TEMPLATE, 'birthday.html')) as f:
+        html_content = f.read()
+    today = date.today()
+    people = db.query(Person).filter(Person.sending_email == True)\
+        .filter(extract('month', Person.birthday) == today.month)\
+        .filter(extract('day', Person.birthday) == today.day)\
+        .all()
+    print('sending birthday email to %d people' % len(people))
+    for person_obj in people:
+        send_email([person_obj.email],
+                   '澳大利亚国际微商总会祝您生日快乐',
+                   html_content.replace('${name}', person_obj.name),
+                   html=True, fr=get_misc('email'))
+
+
+scheduler = GeventScheduler()
+scheduler.add_job(send_birthday_email, 'cron', hour=18, minute=30)
+scheduler.start()
 
 
 if __name__ == "__main__":
