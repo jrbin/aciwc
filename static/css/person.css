@@ -44,3 +44,15 @@
     padding-left: 20px;
     padding-right: 20px;
 }
+
+.form-inline .search-input {
+    width: 300px;
+}
+
+.form-inline .birthday .search-input {
+    width: 150px;
+}
+
+.form-inline .input-group.input-range input {
+    width: auto;
+}

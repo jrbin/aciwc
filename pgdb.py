@@ -2,10 +2,9 @@ from datetime import datetime
 
 import yaml
 from sqlalchemy import Column, Integer, String, ForeignKey, create_engine
-from sqlalchemy.types import DateTime, Boolean
-from sqlalchemy.orm import relationship, sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
-
+from sqlalchemy.orm import relationship, sessionmaker
+from sqlalchemy.types import DateTime, Boolean
 
 Base = declarative_base()
 Base.to_dict = lambda self: {c.name: getattr(self, c.name) for c in self.__table__.columns}

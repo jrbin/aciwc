@@ -1,24 +1,22 @@
-import os
+import functools
 import math
+import os
 import random
 import string
-import functools
-from datetime import datetime, date, timedelta
+from datetime import date, timedelta
 
-from flask import Flask, send_from_directory, render_template, request, \
-    redirect, url_for, session, Response, jsonify
-from werkzeug.utils import secure_filename
-from bs4 import BeautifulSoup
 import requests
-from dateutil.parser import parse
-from sqlalchemy import extract
-from sqlalchemy.orm import joinedload
-from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.schedulers.gevent import GeventScheduler
+from bs4 import BeautifulSoup
+from dateutil.parser import parse
+from flask import Flask, send_from_directory, render_template, request, \
+    redirect, url_for, session, Response
+from sqlalchemy import extract
+from sqlalchemy.orm import joinedload, contains_eager
+from werkzeug.utils import secure_filename
 
 from db import *
 from pgdb import Session, Person, Organization
-
 
 with open("config.yml", 'r') as config_file:
     cfg = yaml.load(config_file)
@@ -26,10 +24,11 @@ with open("config.yml", 'r') as config_file:
 ACCESS_RECORD = dict()
 ACCESS_THRESHOLD = 5
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
+CWD = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+UPLOAD_FOLDER = os.path.join(CWD, 'static', 'img')
 
 # app = Flask(__name__, static_url_path='', template_folder='')
 app = Flask(__name__)
-app.config['UPLOAD_FOLDER'] = 'img/'
 app.secret_key = cfg['flask']['session_key']
 
 APP_ROOT = os.path.dirname(os.path.abspath(__file__))
@@ -59,6 +58,7 @@ def requires_auth(f):
         if not auth or not check_auth(auth.username, auth.password):
             return authenticate()
         return f(*args, **kwargs)
+
     return decorated
 
 
@@ -139,7 +139,6 @@ def manage(entity='partner'):
 @app.route("/edit/<entity>/<int:entity_id>", methods=["GET", "POST"])
 @requires_auth
 def edit(entity: str, entity_id: int = None):
-
     if request.method == "GET":
         item = None
         if entity_id is not None:
@@ -198,7 +197,7 @@ def upload():
         return 'No selected file', 400
     if file and allowed_file(file.filename):
         filename = secure_filename(file.filename)
-        file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+        file.save(os.path.join(UPLOAD_FOLDER, filename))
         return url_for('send_img', folder='img', filename=filename)
     return 'file extension not allowed', 400
 
@@ -233,11 +232,11 @@ def contact():
     return render_template('contact.html', links=links)
 
 
-def send_email(to: list or tuple, subject: str, text: str, fr=cfg['mailgun']['default_smtp_login'], html=False):
+def send_email(to: list or tuple, subject: str, content: str, fr=cfg['mailgun']['default_smtp_login'], html=False):
     if html:
-        data = {"from": fr, "to": to, "subject": subject, "html": text}
+        data = {"from": fr, "to": to, "subject": subject, "html": content}
     else:
-        data = {"from": fr, "to": to, "subject": subject, "text": text}
+        data = {"from": fr, "to": to, "subject": subject, "text": content}
     return requests.post(
         cfg['mailgun']['api_url'],
         auth=("api", cfg['mailgun']['api_key']),
@@ -304,7 +303,7 @@ def sliptcha():
         step = len(positions) // threshold
         positions = [positions[i * step] for i in range(threshold)]
 
-    diffs = [positions[i+1] - positions[i] for i in range(len(positions) - 1)]
+    diffs = [positions[i + 1] - positions[i] for i in range(len(positions) - 1)]
     mean = sum(diffs) / len(diffs)
     deviation = math.sqrt(
         sum([math.pow(mean - diff, 2) for diff in diffs])
@@ -352,7 +351,7 @@ def person():
 
     # GET
     action = request.args.get('action', 'list')
-    if action == 'list':
+    if action == 'list' or action == 'download':
         name = request.args.get('name')
         email = request.args.get('email')
         organization = request.args.get('organization')
@@ -361,15 +360,24 @@ def person():
         page = int(request.args.get('page', 1))
         num = int(request.args.get('num', 10))
 
-        query = db.query(Person).options(joinedload(Person.organization))
+        query = db.query(Person).join(Person.organization).options(contains_eager(Person.organization))
         if name:
             query = query.filter(Person.name.ilike('%{}%'.format(name)))
         if email:
             query = query.filter(Person.email == email)
         if organization:
-            query = query.filter(Person.organization.ilike('%{}%'.format(organization)))
+            query = query.filter(Organization.name.ilike('%{}%'.format(organization)))
         if date_from and date_to:
             query = query.filter(Person.birthday.between(date_from, date_to))
+
+        if action == 'download':
+            def csv_generator():
+                yield 'Name,Email,Organization,Birthday\n'
+                for p in query.all():
+                    yield ','.join([p.name, p.email, p.organization.name, p.birthday.strftime('%Y-%m-%d')]) + '\n'
+            return Response(csv_generator(),
+                            mimetype='text/csv',
+                            headers={'Content-Disposition': 'attachment;filename=data.csv'})
 
         count = query.count()
         total_pages = (count + num - 1) // num
@@ -473,9 +481,9 @@ def send_birthday_email():
     with open(os.path.join(APP_TEMPLATE, 'birthday.html')) as f:
         html_content = f.read()
     today = date.today()
-    people = db.query(Person).filter(Person.sending_email == True)\
-        .filter(extract('month', Person.birthday) == today.month)\
-        .filter(extract('day', Person.birthday) == today.day)\
+    people = db.query(Person).filter(Person.sending_email == True) \
+        .filter(extract('month', Person.birthday) == today.month) \
+        .filter(extract('day', Person.birthday) == today.day) \
         .all()
     print('sending birthday email to %d people' % len(people))
     for person_obj in people:
@@ -488,7 +496,6 @@ def send_birthday_email():
 scheduler = GeventScheduler()
 scheduler.add_job(send_birthday_email, 'cron', hour=18, minute=30)
 scheduler.start()
-
 
 if __name__ == "__main__":
     app.run(debug=True, host='127.0.0.1')

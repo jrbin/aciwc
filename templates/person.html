@@ -22,16 +22,24 @@
 
         {% if not action or action == 'list' %}
         <div class="search-bar">
-            <form class="form-inline">
-                <input type="text" class="form-control search-input" name="name">
+            <form class="form-inline search-form">
+                <input name="action" value="list" hidden>
+                <input type="text" class="form-control search-input" name="name" value="{{ name if name }}" placeholder="Name">
+                <input type="text" class="form-control search-input" name="email" value="{{ email if email }}" placeholder="Email" style="display: none;">
+                <input type="text" class="form-control search-input" name="organization" value="{{ organization if organization }}" placeholder="Organization" style="display: none;">
+                <div class="input-group input-range birthday" style="display: none;">
+                    <input class="form-control datepicker search-input" type="text" name="dateFrom" value="{{ dateFrom if dateFrom }}" placeholder="from">
+                    <span class="input-group-addon">to</span>
+                    <input class="form-control datepicker search-input" type="text" name="dateTo" value="{{ dateTo if dateTo }}" placeholder="to">
+                </div>
                 <select class="form-control search-type">
-                    <option>Name</option>
-                    <option>Email</option>
-                    <option>Organization</option>
-                    <option>Birthday</option>
+                    <option value="name">Name</option>
+                    <option value="email" {{ 'selected' if email }}>Email</option>
+                    <option value="organization" {{ 'selected' if organization }}>Organization</option>
+                    <option value="birthday" {{ 'selected' if birthday }}>Birthday</option>
                 </select>
                 <button class="form-control btn btn-secondary">搜索</button>
-                <button class="form-control btn btn-secondary">导出搜索结果</button>
+                <a class="form-control btn btn-secondary" href="{{ url_for('person', action='download', name=name, email=email, organization=organization, dateFrom=dateFrom, dateTo=dateTo) }}">导出搜索结果</a>
             </form>
         </div>
         <p class="text-muted table-hint">双击以修改单元格</p>
@@ -85,7 +93,7 @@
                     </td>
                     <td class="mutable">
                         <div class="input-group" hidden>
-                            <input type="text" class="form-control update-input" name="birthday" value="{{ person.birthday.strftime('%Y-%m-%d') }}">
+                            <input type="text" class="form-control update-input datepicker" name="birthday" value="{{ person.birthday.strftime('%Y-%m-%d') }}">
                             <span class="input-group-btn">
                                 <button class="btn btn-secondary update-cancel" type="button">✗</button>
                             </span>
@@ -155,7 +163,7 @@
                 </div>
                 <input name="target" value="person" hidden>
                 <input name="action" value="insert" hidden>
-                <button class="btn btn-primary">上传</button>
+                <button class="btn btn-primary">添加</button>
             </form>
         </div>
         {% endif %}
@@ -179,8 +187,28 @@
             });
 
             $('.search-type').on('change', function() {
-                var searchInput = $(this).siblings('.search-input');
-                searchInput.attr('name', $(this).val().toLowerCase());
+                var type = $(this).val();
+                var inputs = {
+                    name: $('.search-input[name="name"]').hide(),
+                    email: $('.search-input[name="email"]').hide(),
+                    organization: $('.search-input[name="organization"]').hide(),
+                    birthday: $('.search-bar .birthday').hide(),
+                };
+                inputs[type].show();
+            });
+
+            $('.search-type').trigger('change');
+
+            $('.search-form').submit(function() {
+                $(this).find('input.search-input').attr("disabled", "disabled");
+                var type = $(this).find('.search-type').val();
+                if (type == 'birthday') {
+                    $(this).find('input[name="dateFrom"]').removeAttr("disabled");
+                    $(this).find('input[name="dateTo"]').removeAttr("disabled");
+                } else {
+                    $(this).find('input[name="' + type + '"]').removeAttr("disabled");
+                }
+                return true;
             });
 
             $('.mutable').dblclick(function() {
