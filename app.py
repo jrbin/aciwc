@@ -24,7 +24,7 @@ with open("config.yml", 'r') as config_file:
 ACCESS_RECORD = dict()
 ACCESS_THRESHOLD = 5
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
-CWD = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+CWD = os.path.dirname(os.path.abspath(__file__))
 UPLOAD_FOLDER = os.path.join(CWD, 'static', 'img')
 
 # app = Flask(__name__, static_url_path='', template_folder='')
