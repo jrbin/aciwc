@@ -3,6 +3,7 @@ import math
 import os
 import random
 import string
+import hashlib
 from datetime import date, timedelta
 
 import requests
@@ -23,7 +24,7 @@ with open("config.yml", 'r') as config_file:
 
 ACCESS_RECORD = dict()
 ACCESS_THRESHOLD = 5
-ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
+ALLOWED_EXTENSIONS = {'.png', '.jpg', '.jpeg', '.gif'}
 CWD = os.path.dirname(os.path.abspath(__file__))
 UPLOAD_FOLDER = os.path.join(CWD, 'static', 'img')
 
@@ -195,10 +196,13 @@ def upload():
     # submit a empty part without filename
     if file.filename == '':
         return 'No selected file', 400
-    if file and allowed_file(file.filename):
-        filename = secure_filename(file.filename)
+    filename_root, ext = os.path.splitext(file.filename)
+    if ext.lower() in ALLOWED_EXTENSIONS:
+        hash = hashlib.sha224(file.read()).hexdigest()[:16]
+        filename = secure_filename(filename_root + '.' + hash + ext)
+        file.seek(0)
         file.save(os.path.join(UPLOAD_FOLDER, filename))
-        return url_for('send_img', folder='img', filename=filename)
+        return url_for('send_img', folder='img', path=filename)
     return 'file extension not allowed', 400
 
 
@@ -335,15 +339,18 @@ def person():
     if request.method == 'POST':
         name = request.form['name'].strip()
         email = request.form['email'].strip()
+        phone = request.form['phone'].strip()
         organization = request.form['organization'].strip()
         organization = get_or_create(db, Organization, name=organization)
-        birthday = request.form['birthday'].strip()
+        position = request.form['position'].strip()
+        extra = request.form['extra'].strip()
+        birthday = request.form['birthday'].strip() or None
         if 'sendingEmail' in request.form:
             sending_email = True
         else:
             sending_email = False
         person_obj = Person(
-            name=name, email=email, birthday=birthday,
+            name=name, email=email, phone=phone, position=position, extra=extra, birthday=birthday,
             organization=organization, sending_email=sending_email)
         db.add(person_obj)
         db.commit()
@@ -357,24 +364,43 @@ def person():
         organization = request.args.get('organization')
         date_from = request.args.get('dateFrom')
         date_to = request.args.get('dateTo')
+        person_id = request.args.get('id')
+        phone = request.args.get('phone')
+        position = request.args.get('position')
+        extra = request.args.get('extra')
+
         page = int(request.args.get('page', 1))
         num = int(request.args.get('num', 10))
 
         query = db.query(Person).join(Person.organization).options(contains_eager(Person.organization))
         if name:
-            query = query.filter(Person.name.ilike('%{}%'.format(name)))
+            query = query.filter(Person.name.ilike('%{}%'.format(name.strip())))
         if email:
-            query = query.filter(Person.email == email)
+            query = query.filter(Person.email.ilike('%{}%'.format(email.strip())))
         if organization:
-            query = query.filter(Organization.name.ilike('%{}%'.format(organization)))
+            query = query.filter(Organization.name.ilike('%{}%'.format(organization.strip())))
         if date_from and date_to:
-            query = query.filter(Person.birthday.between(date_from, date_to))
+            query = query.filter(Person.birthday.between(date_from.strip(), date_to.strip()))
+        if person_id:
+            query = query.filter(Person.id == person_id.strip())
+        if phone:
+            query = query.filter(Person.phone.ilike('%{}%'.format(phone.strip())))
+        if position:
+            query = query.filter(Person.position.ilike('%{}%'.format(position.strip())))
+        if extra:
+            query = query.filter(Person.extra.ilike('%{}%'.format(extra.strip())))
 
         if action == 'download':
             def csv_generator():
-                yield 'Name,Email,Organization,Birthday\n'
+                yield 'Name,Email,Phone,Organization,Position,Birthday,Extra\n'
                 for p in query.all():
-                    yield ','.join([p.name, p.email, p.organization.name, p.birthday.strftime('%Y-%m-%d')]) + '\n'
+                    yield ','.join([p.name,
+                                    p.email,
+                                    p.phone,
+                                    p.organization.name,
+                                    p.position,
+                                    p.birthday.strftime('%Y-%m-%d') if p.birthday else '',
+                                    p.extra]) + '\n'
             return Response(csv_generator(),
                             mimetype='text/csv',
                             headers={'Content-Disposition': 'attachment;filename=data.csv'})
@@ -398,7 +424,8 @@ def person():
         return render_template('person.html', people=people, page=page, num=num,
                                count=count, total_pages=total_pages, left=left,
                                right=right, action=action, name=name, email=email,
-                               organization=organization, dateFrom=date_from, dateTo=date_to)
+                               organization=organization, dateFrom=date_from, dateTo=date_to,
+                               id=person_id, phone=phone, position=position, extra=extra)
     else:
         return render_template('person.html', action=action)
 
@@ -422,6 +449,12 @@ def person_single(person_id=None):
             data = person_obj.birthday = request.form['birthday']
         if 'sendingEmail' in request.form:
             data = person_obj.sending_email = request.form['sendingEmail']
+        if 'phone' in request.form:
+            data = person_obj.phone = request.form['phone']
+        if 'position' in request.form:
+            data = person_obj.position = request.form['position']
+        if 'extra' in request.form:
+            data = person_obj.extra = request.form['extra']
         db.commit()
         return data
 
@@ -444,8 +477,11 @@ def person_batch():
         col_dict = {
             'name': 0,
             'email': 1,
-            'organization': 2,
-            'birthday': 3,
+            'phone': 2,
+            'organization': 3,
+            'position': 4,
+            'birthday': 5,
+            'extra': 6,
         }
         people = []
         line = file.readline().strip().decode()
@@ -464,12 +500,15 @@ def person_batch():
             values = line.split(',')
             name = values[col_dict['name']].strip()
             email = values[col_dict['email']].strip()
+            phone = values[col_dict['phone']].strip()
             organization = values[col_dict['organization']].strip()
             organization = get_or_create(db, Organization, name=organization)
+            position = values[col_dict['position']].strip()
             birthday = values[col_dict['birthday']].strip()
+            extra = values[col_dict['extra']].strip()
             person_obj = Person(
-                name=name, email=email, birthday=birthday,
-                organization=organization, sending_email=True)
+                name=name, email=email, phone=phone, birthday=birthday,
+                organization=organization, position=position, sending_email=True, extra=extra)
             people.append(person_obj)
         db.add_all(people)
         db.commit()
@@ -481,7 +520,8 @@ def send_birthday_email():
     with open(os.path.join(APP_TEMPLATE, 'birthday.html')) as f:
         html_content = f.read()
     today = date.today()
-    people = db.query(Person).filter(Person.sending_email == True) \
+    people = db.query(Person) \
+        .filter(Person.sending_email == True) \
         .filter(extract('month', Person.birthday) == today.month) \
         .filter(extract('day', Person.birthday) == today.day) \
         .all()

@@ -1,10 +1,9 @@
 from datetime import datetime
 
 import yaml
-from sqlalchemy import Column, Integer, String, ForeignKey, create_engine
+from sqlalchemy import Column, Integer, String, ForeignKey, create_engine, Text, DateTime, Boolean
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship, sessionmaker
-from sqlalchemy.types import DateTime, Boolean
 
 Base = declarative_base()
 Base.to_dict = lambda self: {c.name: getattr(self, c.name) for c in self.__table__.columns}
@@ -16,8 +15,11 @@ class Person(Base):
     id = Column(Integer, primary_key=True)
     organization_id = Column(Integer, ForeignKey('organization.id'))
     name = Column(String, nullable=False)
-    email = Column(String, nullable=False)
-    birthday = Column(DateTime)
+    email = Column(String, nullable=False, default='')
+    phone = Column(String, nullable=False, default='')
+    position = Column(String, nullable=False, default='')
+    birthday = Column(DateTime, nullable=True)
+    extra = Column(Text, nullable=False, default='')
     sending_email = Column(Boolean, nullable=False, default=True)
     date_added = Column(DateTime, nullable=False, default=datetime.now())
     date_modified = Column(DateTime, nullable=False, default=datetime.now(),

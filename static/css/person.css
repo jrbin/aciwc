@@ -24,11 +24,6 @@
     margin-bottom: 0;
 }
 
-.result-table input.form-control {
-    padding-top: .25rem;
-    padding-bottom: .25rem;
-    font-size: 0.875rem;
-}
 
 .result-table .btn {
     padding: .25rem .75rem;
@@ -55,4 +50,40 @@
 
 .form-inline .input-group.input-range input {
     width: auto;
+}
+
+table .col-id {
+    width: 60px;
+}
+
+table .col-name {
+    width: 180px;
+}
+
+table .col-email {
+    width: 270px;
+}
+
+table .col-phone {
+    width: 180px;
+}
+
+table .col-action {
+    width: 180px;
+}
+
+table.my-table {
+    min-width: 1000px;
+}
+
+.modal-body .row {
+    margin-bottom: 15px;
+}
+
+.modal-body .row .col-sm-3 {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    font-weight: 500;
+    text-align: right;
 }

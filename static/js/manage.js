@@ -33,9 +33,9 @@ $(function() {
         }
     });
 
-    $(".img-size").text(function() {
-        img = $(this).parent().find('td img')[0];
-        return img.naturalWidth + ' x ' + img.naturalHeight;
+    $('.hero-img').one('load', function() {
+        $(this).closest('tr').find('.img-size').text(this.naturalWidth + ' x ' + this.naturalHeight);
+    }).each(function() {
+        if (this.complete) $(this).load();
     });
-
 });

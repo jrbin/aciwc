@@ -24,88 +24,109 @@
         <div class="search-bar">
             <form class="form-inline search-form">
                 <input name="action" value="list" hidden>
-                <input type="text" class="form-control search-input" name="name" value="{{ name if name }}" placeholder="Name">
-                <input type="text" class="form-control search-input" name="email" value="{{ email if email }}" placeholder="Email" style="display: none;">
-                <input type="text" class="form-control search-input" name="organization" value="{{ organization if organization }}" placeholder="Organization" style="display: none;">
+                <input type="text" class="form-control search-input" name="id" value="{{ id if id }}">
+                <input type="text" class="form-control search-input" name="name" value="{{ name if name }}" style="display: none;">
+                <input type="text" class="form-control search-input" name="email" value="{{ email if email }}" style="display: none;">
+                <input type="text" class="form-control search-input" name="phone" value="{{ phone if phone }}" style="display: none;">
+                <input type="text" class="form-control search-input" name="organization" value="{{ organization if organization }}" style="display: none;">
                 <div class="input-group input-range birthday" style="display: none;">
-                    <input class="form-control datepicker search-input" type="text" name="dateFrom" value="{{ dateFrom if dateFrom }}" placeholder="from">
+                    <input class="form-control datepicker search-input" type="text" name="dateFrom" value="{{ dateFrom if dateFrom }}">
                     <span class="input-group-addon">to</span>
-                    <input class="form-control datepicker search-input" type="text" name="dateTo" value="{{ dateTo if dateTo }}" placeholder="to">
+                    <input class="form-control datepicker search-input" type="text" name="dateTo" value="{{ dateTo if dateTo }}">
                 </div>
+                <input type="text" class="form-control search-input" name="position" value="{{ position if position }}" style="display: none;">
+                <input type="text" class="form-control search-input" name="extra" value="{{ extra if extra }}" style="display: none;">
                 <select class="form-control search-type">
-                    <option value="name">Name</option>
+                    <option value="id">id</option>
+                    <option value="name" {{ 'selected' if name }}>Name</option>
                     <option value="email" {{ 'selected' if email }}>Email</option>
+                    <option value="phone" {{ 'selected' if phone }}>Phone</option>
                     <option value="organization" {{ 'selected' if organization }}>Organization</option>
-                    <option value="birthday" {{ 'selected' if birthday }}>Birthday</option>
+                    <option value="position" {{ 'selected' if position }}>Position</option>
+                    <option value="birthday" {{ 'selected' if dateFrom and dateTo }}>Birthday</option>
+                    <option value="extra" {{ 'selected' if extra }}>Extra Information</option>
                 </select>
                 <button class="form-control btn btn-secondary">搜索</button>
                 <a class="form-control btn btn-secondary" href="{{ url_for('person', action='download', name=name, email=email, organization=organization, dateFrom=dateFrom, dateTo=dateTo) }}">导出搜索结果</a>
             </form>
         </div>
-        <p class="text-muted table-hint">双击以修改单元格</p>
         <div class="result-table">
-            <table class="table table-striped">
+            <table class="table table-striped my-table">
                 <tr>
-                    <th>Name</th>
-                    <th>Email</th>
-                    <th>Organization</th>
-                    <th>Birthday</th>
-                    <th>Sending Email</th>
-                    <th>Action</th>
+                    <th class="col-id">id</th>
+                    <th class="col-name">Name</th>
+                    <th class="col-org">Organization</th>
+                    <th class="col-email">Email</th>
+                    <th class="col-phone">Phone</th>
+                    <th class="col-action">Action</th>
                 </tr>
                 {% for person in people %}
-                <tr url="{{ url_for('person_single', person_id=person.id) }}">
-                    <td class="mutable">
-                        <div class="input-group" hidden>
-                            <input type="text" class="form-control update-input" name="name" value="{{ person.name }}">
-                            <span class="input-group-btn">
-                                <button class="btn btn-secondary update-cancel" type="button">✗</button>
-                            </span>
-                            <span class="input-group-btn">
-                                <button class="btn btn-secondary update-confirm" type="button">✓</button>
-                            </span>
-                        </div>
-                        <span class="update-text">{{ person.name }}</span>
+                <tr>
+                    <td>{{ person.id }}</td>
+                    <td>{{ person.name }}</td>
+                    <td>{{ person.organization.name }}</td>
+                    <td>{{ person.email }}</td>
+                    <td>{{ person.phone }}</td>
+                    <!--<td><button type="button" class="email-toggle btn {{ 'btn-outline-success' if person.sending_email else 'btn-outline-warning' }}" value="{{ 'a' if person.sending_email else '' }}">{{ 'Enabled' if person.sending_email else 'Disabled' }}</button></td>-->
+                    <td>
+                        <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#myModal{{person.id}}">Detail</button>
+                        <button type="button" class="delete btn btn-outline-danger ">Delete</button>
                     </td>
-                    <td class="mutable">
-                        <div class="input-group" hidden>
-                            <input type="text" class="form-control update-input" name="email" value="{{ person.email }}">
-                            <span class="input-group-btn">
-                                <button class="btn btn-secondary update-cancel" type="button">✗</button>
-                            </span>
-                            <span class="input-group-btn">
-                                <button class="btn btn-secondary update-confirm" type="button">✓</button>
-                            </span>
-                        </div>
-                        <span class="update-text">{{ person.email }}</span>
-                    </td>
-                    <td class="mutable">
-                        <div class="input-group" hidden>
-                            <input type="text" class="form-control update-input" name="organization" value="{{ person.organization.name }}">
-                            <span class="input-group-btn">
-                                <button class="btn btn-secondary update-cancel" type="button">✗</button>
-                            </span>
-                            <span class="input-group-btn">
-                                <button class="btn btn-secondary update-confirm" type="button">✓</button>
-                            </span>
-                        </div>
-                        <span class="update-text">{{ person.organization.name }}</span>
-                    </td>
-                    <td class="mutable">
-                        <div class="input-group" hidden>
-                            <input type="text" class="form-control update-input datepicker" name="birthday" value="{{ person.birthday.strftime('%Y-%m-%d') }}">
-                            <span class="input-group-btn">
-                                <button class="btn btn-secondary update-cancel" type="button">✗</button>
-                            </span>
-                            <span class="input-group-btn">
-                                <button class="btn btn-secondary update-confirm" type="button">✓</button>
-                            </span>
-                        </div>
-                        <span class="update-text">{{ person.birthday.strftime('%Y-%m-%d') }}</span>
-                    </td>
-                    <td><button type="button" class="email-toggle btn {{ 'btn-outline-success' if person.sending_email else 'btn-outline-warning' }}" value="{{ 'a' if person.sending_email else '' }}">{{ 'Enabled' if person.sending_email else 'Disabled' }}</button></td>
-                    <td><button type="button" class="delete btn btn-outline-danger ">Delete</button></td>
                 </tr>
+                <div class="modal" id="myModal{{person.id}}" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+                    <div class="modal-dialog" role="document">
+                        <div class="modal-content" action="{{ url_for('person_single', person_id=person.id) }}">
+                            <div class="modal-body">
+                                <div class="row">
+                                    <div class="col-sm-3">Name</div>
+                                    <div class="col-sm-9">
+                                        <input type="text" class="form-control" name="name" value="{{ person.name }}" origin="{{ person.name }}" required>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-sm-3">Email</div>
+                                    <div class="col-sm-9">
+                                        <input type="email" class="form-control" name="email" value="{{ person.email }}" origin="{{ person.email }}">
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-sm-3">Phone</div>
+                                    <div class="col-sm-9">
+                                        <input type="text" class="form-control" name="phone" value="{{ person.phone }}" origin="{{ person.phone }}">
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-sm-3">Organization</div>
+                                    <div class="col-sm-9">
+                                        <input type="text" class="form-control" name="organization" value="{{ person.organization.name }}"  origin="{{ person.organization.name }}">
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-sm-3">Position</div>
+                                    <div class="col-sm-9">
+                                        <input type="text" class="form-control" name="position" value="{{ person.position }}" origin="{{ person.position }}">
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-sm-3">Birthday</div>
+                                    <div class="col-sm-9">
+                                        <input type="text" class="form-control datepicker" name="birthday" value="{{ person.birthday.strftime('%Y-%m-%d') if person.birthday else '' }}"  origin="{{ person.birthday.strftime('%Y-%m-%d') if person.birthday else '' }}">
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-sm-3">Extra Information</div>
+                                    <div class="col-sm-9">
+                                        <textarea class="form-control" rows="5" name="extra" origin="{{ person.extra }}">{{ person.extra }}</textarea>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                <button type="button" class="btn btn-primary save-changes">Save changes</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
                 {% endfor %}
             </table>
         </div>
@@ -137,11 +158,14 @@
         {% elif action == 'add' %}
         <div class="form-wrapper">
             <form method="POST">
-                <div class="form-group"><input type="text" class="form-control" name="name" placeholder="Name" required></div>
-                <div class="form-group"><input type="email" class="form-control" name="email" placeholder="Email" required></div>
-                <div class="form-group"><input type="text" class="form-control" name="organization" placeholder="Organization" required></div>
-                <div class="form-group"><input type="text" class="form-control datepicker" name="birthday" placeholder="Birthday" required></div>
-                <div class="form-check">
+                <div class="form-group"><input type="text" class="form-control" name="name" placeholder="Name (required)" required></div>
+                <div class="form-group"><input type="email" class="form-control" name="email" placeholder="Email"></div>
+                <div class="form-group"><input type="text" class="form-control" name="phone" placeholder="Phone"></div>
+                <div class="form-group"><input type="text" class="form-control" name="organization" placeholder="Organization"></div>
+                <div class="form-group"><input type="text" class="form-control" name="position" placeholder="Position"></div>
+                <div class="form-group"><input type="text" class="form-control datepicker" name="birthday" placeholder="Birthday"></div>
+                <div class="form-group"><textarea class="form-control" rows="5" name="extra" placeholder="Extra Information"></textarea></div>
+                <div class="form-check" hidden>
                     <label class="form-check-label">
                         <input type="checkbox" class="form-check-input" name="sendingEmail" checked>
                         Sending Birthday Email
@@ -172,6 +196,7 @@
 
     <script src="/js/jquery.min.js"></script>
     <script src="/js/jquery-ui.min.js"></script>
+    <script src="/js/bootstrap4.min.js"></script>
     <script>
         (function($) {
             $('.datepicker').datepicker({
@@ -189,9 +214,13 @@
             $('.search-type').on('change', function() {
                 var type = $(this).val();
                 var inputs = {
+                    id: $('.search-input[name="id"]').hide(),
                     name: $('.search-input[name="name"]').hide(),
                     email: $('.search-input[name="email"]').hide(),
                     organization: $('.search-input[name="organization"]').hide(),
+                    phone: $('.search-input[name="phone"]').hide(),
+                    position: $('.search-input[name="position"]').hide(),
+                    extra: $('.search-input[name="extra"]').hide(),
                     birthday: $('.search-bar .birthday').hide(),
                 };
                 inputs[type].show();
@@ -277,6 +306,43 @@
                 $.ajax({
                     url: $(this).closest('tr').attr('url'),
                     method: 'DELETE',
+                })
+                .done(function( data, textStatus, jqXHR ) {
+                    location.reload();
+                })
+                .fail(function( jqXHR, textStatus, errorThrown ) {
+                    // popular fields: jqXHR.status, jqXHR.statusText, jqXHR.responseText
+                })
+                .always(function() {
+                    // parameters are ( data|jqXHR, textStatus, jqXHR|errorThrown )
+                });
+            });
+
+            $('button.save-changes').click(function() {
+                var form = $(this).closest('.modal-content');
+                var inputs = form.find('input, textarea');
+                var textarea = form.find('textarea');
+                var fd = new FormData();
+                var cnt = 0;
+                $.each(inputs, function(i, elem) {
+                    var obj = $(this);
+                    if (obj.val() != obj.attr('origin')) {
+                        fd.append(obj.attr('name'), obj.val());
+                        cnt++;
+                    }
+                });
+
+                if (cnt == 0) {
+                    $(this).closest('.modal').modal('hide');
+                    return;
+                }
+
+                $.ajax({
+                    url: form.attr('action'),
+                    method: 'PUT',
+                    data: fd,
+                    processData: false,
+                    contentType: false,
                 })
                 .done(function( data, textStatus, jqXHR ) {
                     location.reload();
