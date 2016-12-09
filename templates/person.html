@@ -61,7 +61,7 @@
                     <th class="col-action">Action</th>
                 </tr>
                 {% for person in people %}
-                <tr>
+                <tr url="{{ url_for('person_single', person_id=person.id) }}">
                     <td>{{ person.id }}</td>
                     <td>{{ person.name }}</td>
                     <td>{{ person.organization.name }}</td>

@@ -4,6 +4,11 @@ import os
 import random
 import string
 import hashlib
+import smtplib
+import ssl
+from email.header import Header
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
 from datetime import date, timedelta
 
 import requests
@@ -236,15 +241,40 @@ def contact():
     return render_template('contact.html', links=links)
 
 
-def send_email(to: list or tuple, subject: str, content: str, fr=cfg['mailgun']['default_smtp_login'], html=False):
-    if html:
-        data = {"from": fr, "to": to, "subject": subject, "html": content}
+def send_email(fr: str, to: str, subject: str, txt='', html='', provider='smtp'):
+    if provider == 'smtp':
+        msg = MIMEMultipart('alternative')
+        msg['Subject'] = Header(subject, 'utf-8')
+        msg['From'] = cfg['smtp']['login']
+        msg['To'] = to
+
+        part1 = MIMEText(txt.encode('utf-8'), 'plain', 'utf-8')
+        msg.attach(part1)
+
+        if html:
+            part2 = MIMEText(html.encode('utf-8'), 'html', 'utf-8')
+            msg.attach(part2)
+
+        smtp_server = smtplib.SMTP('smtp.office365.com', port=587)
+        ssl_context = ssl.create_default_context()
+        smtp_server.starttls(context=ssl_context)
+        smtp_server.login(cfg['smtp']['login'], cfg['smtp']['password'])
+        smtp_server.send_message(msg)
+        smtp_server.quit()
+
     else:
-        data = {"from": fr, "to": to, "subject": subject, "text": content}
-    return requests.post(
-        cfg['mailgun']['api_url'],
-        auth=("api", cfg['mailgun']['api_key']),
-        data=data)
+        r = requests.post(
+            cfg['mailgun']['api_url'],
+            auth=('api', cfg['mailgun']['api_key']),
+            data={
+                'from': fr or cfg['default_sender'],
+                'to': to,
+                'subject': subject,
+                'text': txt,
+                'html': html
+            }
+        )
+        print(r.text)
 
 
 def check_ip_frequency(ip):
@@ -285,11 +315,13 @@ def send():
         content += '\n电话: ' + phone
     if organization:
         content += '\n公司: ' + organization
-    to = (get_misc('email'),)
-    r = send_email(to, '网站反馈', content, email)
-    if r.status_code >= 400:
-        return r.text, r.status_code
-    return r.text
+    to = get_misc('email')
+    try:
+        send_email(email, to, '网站反馈', txt=content, provider='mailgun')
+    except Exception as e:
+        print(e)
+        return '', 400
+    return ''
 
 
 def random_string(size=10, chars=string.ascii_uppercase + string.digits):
@@ -447,6 +479,8 @@ def person_single(person_id=None):
             data = person_obj.organization.name
         if 'birthday' in request.form:
             data = person_obj.birthday = request.form['birthday']
+            if not person_obj.birthday:
+                person_obj.birthday = None
         if 'sendingEmail' in request.form:
             data = person_obj.sending_email = request.form['sendingEmail']
         if 'phone' in request.form:
@@ -519,6 +553,8 @@ def send_birthday_email():
     db = Session()
     with open(os.path.join(APP_TEMPLATE, 'birthday.html')) as f:
         html_content = f.read()
+    with open(os.path.join(APP_TEMPLATE, 'birthday.txt')) as f:
+        text_content = f.read()
     today = date.today()
     people = db.query(Person) \
         .filter(Person.sending_email == True) \
@@ -527,14 +563,15 @@ def send_birthday_email():
         .all()
     print('sending birthday email to %d people' % len(people))
     for person_obj in people:
-        send_email([person_obj.email],
+        send_email(get_misc('email'), person_obj.email,
                    '澳大利亚国际微商总会祝您生日快乐',
-                   html_content.replace('${name}', person_obj.name),
-                   html=True, fr=get_misc('email'))
+                   txt=text_content.replace('${name}', person_obj.name),
+                   html=html_content.replace('${name}', person_obj.name),
+                   provider='mailgun')
 
 
 scheduler = GeventScheduler()
-scheduler.add_job(send_birthday_email, 'cron', hour=18, minute=30)
+scheduler.add_job(send_birthday_email, 'cron', hour=15, minute=00)
 scheduler.start()
 
 if __name__ == "__main__":
