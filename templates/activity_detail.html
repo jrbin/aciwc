@@ -31,7 +31,7 @@
       <div class="row">
         <div class="col-md-12 col-sm-12">
           <h2 class="detail-title">{{ activity.title }}</h2>
-          <div class="detail-time">发布时间：{{ activity.published_time.strftime('%Y-%m-%d %H:%M') }}</div>
+          <div class="detail-time">活动时间：{{ activity.activity_time.strftime('%Y-%m-%d %H:%M') }}</div>
           <div class="detail-content">{{ activity.html|safe }}</div>
         </div>
       </div>

@@ -49,5 +49,7 @@ h2.detail-title {
 }
 
 .detail-content img {
+    display: inline;
     max-width: 100%;
+    border-radius: 0;
 }
