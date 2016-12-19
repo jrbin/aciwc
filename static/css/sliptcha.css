@@ -17,6 +17,10 @@
     align-items: center;
 }
 
+.slider-piece:hover, .slider-piece:focus {
+    cursor: pointer;
+}
+
 .slider-left {
     position: absolute;
     top: 0;
