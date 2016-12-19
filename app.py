@@ -24,21 +24,20 @@ from werkzeug.utils import secure_filename
 from db import *
 from pgdb import Session, Person, Organization
 
-with open("config.yml", 'r') as config_file:
+CWD = os.path.dirname(os.path.abspath(__file__))
+with open(os.path.join(CWD, 'config.yml'), 'r') as config_file:
     cfg = yaml.load(config_file)
 
 ACCESS_RECORD = dict()
 ACCESS_THRESHOLD = 5
 ALLOWED_EXTENSIONS = {'.png', '.jpg', '.jpeg', '.gif'}
-CWD = os.path.dirname(os.path.abspath(__file__))
 UPLOAD_FOLDER = os.path.join(CWD, 'static', 'img')
 
 # app = Flask(__name__, static_url_path='', template_folder='')
 app = Flask(__name__)
 app.secret_key = cfg['flask']['session_key']
 
-APP_ROOT = os.path.dirname(os.path.abspath(__file__))
-APP_TEMPLATE = os.path.join(APP_ROOT, 'templates')
+APP_TEMPLATE = os.path.join(CWS, 'templates')
 
 
 def check_auth(username, password):
@@ -568,6 +567,11 @@ def send_birthday_email():
                    txt=text_content.replace('${name}', person_obj.name),
                    html=html_content.replace('${name}', person_obj.name),
                    provider='mailgun')
+
+
+@app.route('/ip')
+def test_ip():
+    return request.environ.get('HTTP_X_REAL_IP', request.remote_addr)
 
 
 scheduler = GeventScheduler()

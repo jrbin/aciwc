@@ -1,3 +1,4 @@
+import os
 from datetime import datetime
 
 import yaml
@@ -5,11 +6,11 @@ from sqlalchemy import create_engine, Table, Column, Integer, String, \
     MetaData, DateTime, Boolean
 from sqlalchemy.sql import select, text
 
-
-with open("config.yml", 'r') as config_file:
+CWD = os.path.dirname(__file__)
+with open(os.path.join(CWD, 'config.yml'), 'r') as config_file:
     cfg = yaml.load(config_file)
 
-engine = create_engine('sqlite:///' + cfg['sqlite']['db'], echo=True)
+engine = create_engine('sqlite:///' + os.path.join(CWD, cfg['sqlite']['db']), echo=True)
 
 metadata = MetaData()
 

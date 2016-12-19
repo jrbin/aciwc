@@ -1,3 +1,4 @@
+import os
 from datetime import datetime
 
 import yaml
@@ -41,7 +42,8 @@ class Organization(Base):
     people = relationship('Person', back_populates='organization')
 
 
-with open("config.yml", 'r') as config_file:
+CWD = os.path.dirname(__file__)
+with open(os.path.join(CWD, 'config.yml'), 'r') as config_file:
     cfg = yaml.load(config_file)
 
 db = cfg['postgres']
