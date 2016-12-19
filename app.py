@@ -37,7 +37,7 @@ UPLOAD_FOLDER = os.path.join(CWD, 'static', 'img')
 app = Flask(__name__)
 app.secret_key = cfg['flask']['session_key']
 
-APP_TEMPLATE = os.path.join(CWS, 'templates')
+APP_TEMPLATE = os.path.join(CWD, 'templates')
 
 
 def check_auth(username, password):
