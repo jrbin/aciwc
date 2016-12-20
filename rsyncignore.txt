@@ -6,4 +6,5 @@ env
 *.db
 *.sqlite3
 deploy.sh
+img
 rsyncignore.txt

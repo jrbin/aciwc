@@ -43,6 +43,26 @@ $(function () {
             "searchreplace visualblocks code fullscreen",
             "insertdatetime media table contextmenu paste imagetools"
         ],
+        setup: function(editor) {
+            editor.addButton('mybutton', {
+                text: 'My Button', 
+                icon: false,
+                onclick: function() {
+                    editor.windowManager.open({
+                        title: '插入微信文章',
+                        width: 320,
+                        body: [{
+                            type: 'textbox',
+                            name: 'url',
+                            label: 'URL'
+                        }],
+                        onsubmit: function(e) {
+                            alert('yes');
+                        }
+                    });
+                }
+            })
+        }
     });
 
     $('form').bind('form-pre-serialize', function(e) {
