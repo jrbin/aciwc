@@ -1,28 +1,23 @@
 import functools
-import math
-import os
-import random
-import string
 import hashlib
+import math
+import random
 import smtplib
 import ssl
+import string
+from datetime import timedelta
 from email.header import Header
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
-from datetime import date, timedelta
 
 import requests
-from apscheduler.schedulers.gevent import GeventScheduler
 from bs4 import BeautifulSoup
 from dateutil.parser import parse
 from flask import Flask, send_from_directory, render_template, request, \
     redirect, url_for, session, Response
-from sqlalchemy import extract
-from sqlalchemy.orm import joinedload, contains_eager
 from werkzeug.utils import secure_filename
 
 from db import *
-from pgdb import Session, Person, Organization
 
 CWD = os.path.dirname(os.path.abspath(__file__))
 with open(os.path.join(CWD, 'config.yml'), 'r') as config_file:
@@ -202,8 +197,8 @@ def upload():
         return 'No selected file', 400
     filename_root, ext = os.path.splitext(file.filename)
     if ext.lower() in ALLOWED_EXTENSIONS:
-        hash = hashlib.sha224(file.read()).hexdigest()[:16]
-        filename = secure_filename(filename_root + '.' + hash + ext)
+        hashed = hashlib.sha224(file.read()).hexdigest()[:16]
+        filename = secure_filename(filename_root + '.' + hashed + ext)
         file.seek(0)
         file.save(os.path.join(UPLOAD_FOLDER, filename))
         return url_for('send_img', folder='img', path=filename)
@@ -363,220 +358,10 @@ def get_or_create(db_session, model, **kwargs):
         return instance
 
 
-@app.route('/person', methods=['GET', 'POST'])
-@requires_auth
-def person():
-    db = Session()
-    if request.method == 'POST':
-        name = request.form['name'].strip()
-        email = request.form['email'].strip()
-        phone = request.form['phone'].strip()
-        organization = request.form['organization'].strip()
-        organization = get_or_create(db, Organization, name=organization)
-        position = request.form['position'].strip()
-        extra = request.form['extra'].strip()
-        birthday = request.form['birthday'].strip() or None
-        if 'sendingEmail' in request.form:
-            sending_email = True
-        else:
-            sending_email = False
-        person_obj = Person(
-            name=name, email=email, phone=phone, position=position, extra=extra, birthday=birthday,
-            organization=organization, sending_email=sending_email)
-        db.add(person_obj)
-        db.commit()
-        return redirect(url_for('person', action='add'))
-
-    # GET
-    action = request.args.get('action', 'list')
-    if action == 'list' or action == 'download':
-        name = request.args.get('name')
-        email = request.args.get('email')
-        organization = request.args.get('organization')
-        date_from = request.args.get('dateFrom')
-        date_to = request.args.get('dateTo')
-        person_id = request.args.get('id')
-        phone = request.args.get('phone')
-        position = request.args.get('position')
-        extra = request.args.get('extra')
-
-        page = int(request.args.get('page', 1))
-        num = int(request.args.get('num', 10))
-
-        query = db.query(Person).join(Person.organization).options(contains_eager(Person.organization))
-        if name:
-            query = query.filter(Person.name.ilike('%{}%'.format(name.strip())))
-        if email:
-            query = query.filter(Person.email.ilike('%{}%'.format(email.strip())))
-        if organization:
-            query = query.filter(Organization.name.ilike('%{}%'.format(organization.strip())))
-        if date_from and date_to:
-            query = query.filter(Person.birthday.between(date_from.strip(), date_to.strip()))
-        if person_id:
-            query = query.filter(Person.id == person_id.strip())
-        if phone:
-            query = query.filter(Person.phone.ilike('%{}%'.format(phone.strip())))
-        if position:
-            query = query.filter(Person.position.ilike('%{}%'.format(position.strip())))
-        if extra:
-            query = query.filter(Person.extra.ilike('%{}%'.format(extra.strip())))
-
-        if action == 'download':
-            def csv_generator():
-                yield 'Name,Email,Phone,Organization,Position,Birthday,Extra\n'
-                for p in query.all():
-                    yield ','.join([p.name,
-                                    p.email,
-                                    p.phone,
-                                    p.organization.name,
-                                    p.position,
-                                    p.birthday.strftime('%Y-%m-%d') if p.birthday else '',
-                                    p.extra]) + '\n'
-            return Response(csv_generator(),
-                            mimetype='text/csv',
-                            headers={'Content-Disposition': 'attachment;filename=data.csv'})
-
-        count = query.count()
-        total_pages = (count + num - 1) // num
-        total_pages = max(1, total_pages)
-        page = max(1, min(total_pages, page))
-        pages = 10
-        left = page - pages // 2
-        right = page + (pages - 1) // 2
-        if left < 1:
-            left = 1
-            right = min(total_pages, left + pages - 1)
-        elif right > total_pages:
-            right = total_pages
-            left = max(1, right - pages + 1)
-        offset = (page - 1) * num
-
-        people = query.order_by(Person.id.desc()).limit(num).offset(offset).all()
-        return render_template('person.html', people=people, page=page, num=num,
-                               count=count, total_pages=total_pages, left=left,
-                               right=right, action=action, name=name, email=email,
-                               organization=organization, dateFrom=date_from, dateTo=date_to,
-                               id=person_id, phone=phone, position=position, extra=extra)
-    else:
-        return render_template('person.html', action=action)
-
-
-@app.route('/person/<int:person_id>', methods=['PUT', 'DELETE'])
-@requires_auth
-def person_single(person_id=None):
-    db = Session()
-
-    if request.method == 'PUT':
-        person_obj = db.query(Person).filter(Person.id == person_id).first()
-        data = None
-        if 'name' in request.form:
-            data = person_obj.name = request.form['name']
-        if 'email' in request.form:
-            data = person_obj.email = request.form['email']
-        if 'organization' in request.form:
-            person_obj.organization = get_or_create(db, Organization, name=request.form['organization'].strip())
-            data = person_obj.organization.name
-        if 'birthday' in request.form:
-            data = person_obj.birthday = request.form['birthday']
-            if not person_obj.birthday:
-                person_obj.birthday = None
-        if 'sendingEmail' in request.form:
-            data = person_obj.sending_email = request.form['sendingEmail']
-        if 'phone' in request.form:
-            data = person_obj.phone = request.form['phone']
-        if 'position' in request.form:
-            data = person_obj.position = request.form['position']
-        if 'extra' in request.form:
-            data = person_obj.extra = request.form['extra']
-        db.commit()
-        return data
-
-    if request.method == 'DELETE':
-        db.query(Person).filter(Person.id == person_id).delete(synchronize_session=False)
-        db.commit()
-        return ''
-
-
-@app.route('/batch', methods=['POST'])
-@requires_auth
-def person_batch():
-    file = request.files['file']
-    target = request.form['target']
-    action = request.form['action']
-
-    db = Session()
-
-    if target == 'person' and action == 'insert':
-        col_dict = {
-            'name': 0,
-            'email': 1,
-            'phone': 2,
-            'organization': 3,
-            'position': 4,
-            'birthday': 5,
-            'extra': 6,
-        }
-        people = []
-        line = file.readline().strip().decode()
-        values = line.split(',')
-        if len(values) > 0 and values[0] in col_dict:
-            for i, val in enumerate(values):
-                val = val.strip().lower()
-                col_dict[val] = i
-        else:
-            file.seek(0)
-
-        for line in file.readlines():
-            line = line.strip().decode()
-            if not line:
-                continue
-            values = line.split(',')
-            name = values[col_dict['name']].strip()
-            email = values[col_dict['email']].strip()
-            phone = values[col_dict['phone']].strip()
-            organization = values[col_dict['organization']].strip()
-            organization = get_or_create(db, Organization, name=organization)
-            position = values[col_dict['position']].strip()
-            birthday = values[col_dict['birthday']].strip()
-            extra = values[col_dict['extra']].strip()
-            person_obj = Person(
-                name=name, email=email, phone=phone, birthday=birthday,
-                organization=organization, position=position, sending_email=True, extra=extra)
-            people.append(person_obj)
-        db.add_all(people)
-        db.commit()
-        return redirect(url_for('person'))
-
-
-def send_birthday_email():
-    db = Session()
-    with open(os.path.join(APP_TEMPLATE, 'birthday.html')) as f:
-        html_content = f.read()
-    with open(os.path.join(APP_TEMPLATE, 'birthday.txt')) as f:
-        text_content = f.read()
-    today = date.today()
-    people = db.query(Person) \
-        .filter(Person.sending_email == True) \
-        .filter(extract('month', Person.birthday) == today.month) \
-        .filter(extract('day', Person.birthday) == today.day) \
-        .all()
-    print('sending birthday email to %d people' % len(people))
-    for person_obj in people:
-        send_email(get_misc('email'), person_obj.email,
-                   '澳大利亚国际微商总会祝您生日快乐',
-                   txt=text_content.replace('${name}', person_obj.name),
-                   html=html_content.replace('${name}', person_obj.name),
-                   provider='mailgun')
-
-
 @app.route('/ip')
 def test_ip():
     return request.environ.get('HTTP_X_REAL_IP', request.remote_addr)
 
-
-scheduler = GeventScheduler()
-scheduler.add_job(send_birthday_email, 'cron', hour=15, minute=00)
-scheduler.start()
 
 if __name__ == "__main__":
     app.run(debug=True, host='127.0.0.1')

@@ -5,5 +5,3 @@ requests
 gevent
 python-dateutil
 pyyaml
-psycopg2
-apscheduler
