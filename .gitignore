@@ -5,4 +5,8 @@
 env
 aciwc.db
 config.yml
-static
+fonts
+img
+.sass-cache
+*.map
+*.css

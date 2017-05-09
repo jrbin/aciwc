@@ -1,0 +1,248 @@
+@import url(//fonts.googleapis.com/earlyaccess/notosanssc.css);
+
+.aciwc-logo {
+    width: 50px;
+}
+
+.aciwc-icon {
+    &:hover, &:focus {
+        color: #dc6900;
+    }
+}
+
+.aciwc-header {
+    position: relative;
+    z-index: 1000;
+    height: 80px;
+    box-shadow: 0 0 10px #333;
+    .aciwc-list-item {
+        height: 80px;
+        padding: 27px 8px;
+    }
+    .aciwc-menu-btn {
+        height: 80px;
+        margin-left: 32px;
+        padding: 27px 32px;
+        background-color: #f3f3f3;
+    }
+    .aciwc-right {
+        position: absolute;
+        top: 0;
+        right: 0;
+    }
+    .aciwc-bottom {
+        padding-top: 18px;
+        .aciwc-text {
+            position: absolute;
+            bottom: 5px;
+            margin-left: 10px;
+            font-family: georgia, sans-serif;
+        }
+    }
+}
+
+.aciwc-nav {
+    height: 70px;
+    padding-top: 4px;
+    background-color: #e0301e;
+    color: white;
+    font-family: georgia, sans-serif;
+    .aciwc-explore {
+        display: inline-block;
+        font-style: italic;
+        line-height: 66px;
+        font-weight: bold;
+    }
+    .aciwc-nav-item {
+        padding: 0 10px;
+        line-height: 66px;
+    }
+}
+
+.aciwc-hero {
+    position: relative;
+    height: 545px;
+    background-image: url(/img/fintech-homepage.jpg);
+    background-repeat:no-repeat;
+    background-position: center center;
+    .aciwc-bottom {
+        position: absolute;
+        bottom: 0;
+        width: 100%;
+        .aciwc-bottom-line {
+            height: 5px;
+            background-color: #a32020;
+        }
+    }
+    .aciwc-legend {
+        padding: 40px;
+        color: white;
+        font-family: georgia, sans-serif;
+        background-color: #a32020;
+    }
+}
+
+.aciwc-section {
+    padding: 40px 0;
+}
+
+.aciwc-title {
+    margin-bottom: 10px;
+    font-family: georgia, serif;
+    font-style: italic;
+    &.border {
+        padding-top: 20px;
+        border-top: 2px solid #a32020;
+    }
+    &.section-title {
+        margin-bottom: 25px;
+    }
+    &.noto {
+        font-weight: normal;
+        font-family: 'Noto Sans SC', sans-serif;
+    }
+}
+
+.aciwc-bg-grey {
+    background-color: #f2f2f2;
+}
+
+.aciwc-featured-block {
+    border: 1px solid #ccc;
+    .aciwc-img-wrapper {
+        position: relative;
+        padding-bottom: 182px;
+        overflow: hidden;
+        margin: -1px;
+        border-bottom: 1px solid #ccc;
+        img {
+            position: absolute;
+            top: 50%;
+            transform: translate(0, -50%);
+        }
+    }
+}
+
+.aciwc-featured-content {
+    padding: 20px;
+    font-family: georgia, serif;
+}
+
+.aciwc-subtitle {
+    font-size: 18px;
+    line-height: 1.5em;
+    font-style: italic;
+}
+
+.aciwc-btn {
+    display: inline-block;
+    padding: 14px 23px;
+    font-family: Arial, Helvetica, sans-serif;
+    border: 1px solid white;
+    line-height: 1.14em;
+    font-weight: bold;
+    font-size: 0.875rem;
+    &.white {
+        border-color: white;
+    }
+    &.black {
+        border-color: #6d6e71;
+    }
+}
+
+.aciwc-collection-content {
+    padding: 15px 20px;
+    font-family: georgia, sans-serif;
+    border: 1px solid #ccc;
+    background-color: #f2f2f2;
+    .aciwc-date {
+        color: #6e6f72;
+        font-style: italic;
+    }
+    .aciwc-title {
+        font-style: normal;
+        font-size: 24px;
+        line-height: 1.3em;
+        color: #a32020;
+    }
+    .aciwc-paragraph {
+        font-size: 0.875rem;
+    }
+}
+
+.aciwc-paragraph {
+    font-family: Arial, Helvetica, sans-serif;
+    margin-bottom: 0;
+}
+
+.aciwc-video {
+    position: absolute;
+    display: block;
+    margin: 0;
+    padding: 0;
+    border: none;
+    width: 100%;
+    height: 100%;
+}
+
+.aciwc-video-wrapper {
+    position: relative;
+    width: 100%;
+    padding-bottom: 56.25%;
+}
+
+.aciwc-follow {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px 0;
+    background-color: #404041;
+    .aciwc-title {
+        color: white;
+        margin-bottom: 0;
+        margin-right: 20px;
+    }
+}
+
+.aciwc-footer {
+    padding: 20px 0;
+    font-family: georgia, serif;
+    .aciwc-footer-item {
+        width: 120px;
+        padding: 5px 0;
+        font-size: 0.875rem;
+        border-top: 4px solid #939598;
+        a {
+            color: inherit;
+        }
+        &:hover {
+            border-color: #eb8d02;
+            a {
+                color: #eb8d02;
+                text-decoration: none;
+            }
+        }
+    }
+    .aciwc-claim {
+        font-size: 0.6875rem;
+        font-family:Arial, Helvetica, sans-serif;
+        a {
+            color: inherit;
+            text-decoration: underline;
+            &:hover {
+                color: #a32020;
+            }
+        }
+    }
+    .aciwc-footer-link {
+        font-size: 0.6875rem;
+        font-family:Arial, Helvetica, sans-serif;
+        margin-right: 40px;
+        a {
+            color: inherit;
+            &:hover {
+                color: #a32020;
+            }
+        }
+    }
+}
