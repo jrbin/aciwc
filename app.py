@@ -363,5 +363,10 @@ def test_ip():
     return request.environ.get('HTTP_X_REAL_IP', request.remote_addr)
 
 
+@app.route('/newhome')
+def new_home():
+    return render_template('index2.html')
+
+
 if __name__ == "__main__":
     app.run(debug=True, host='127.0.0.1')
