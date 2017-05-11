@@ -44,12 +44,12 @@
 .aciwc-nav {
     height: 70px;
     padding-top: 4px;
-    background-color: #e0301e;
+    //background-color: #e0301e;
+    background-color: #262654;
     color: white;
     font-family: georgia, sans-serif;
     .aciwc-explore {
         display: inline-block;
-        font-style: italic;
         line-height: 66px;
         font-weight: bold;
     }
@@ -62,23 +62,27 @@
 .aciwc-hero {
     position: relative;
     height: 545px;
-    background-image: url(/img/fintech-homepage.jpg);
+    background-image: url(/img/55.jpg);
     background-repeat:no-repeat;
     background-position: center center;
+    background-size: cover;
     .aciwc-bottom {
         position: absolute;
         bottom: 0;
         width: 100%;
         .aciwc-bottom-line {
             height: 5px;
-            background-color: #a32020;
+            //background-color: #a32020;
+            background-color: #7f7f7f;
         }
     }
     .aciwc-legend {
         padding: 40px;
         color: white;
         font-family: georgia, sans-serif;
-        background-color: #a32020;
+        #background-color: #a32020;
+        background-color: #7f7f7f;
+        opacity: 0.8;
     }
 }
 
@@ -92,14 +96,12 @@
     font-style: italic;
     &.border {
         padding-top: 20px;
-        border-top: 2px solid #a32020;
+        border-top: 2px solid #7f7f7f;
     }
     &.section-title {
         margin-bottom: 25px;
-    }
-    &.noto {
         font-weight: normal;
-        font-family: 'Noto Sans SC', sans-serif;
+        font-style: normal;
     }
 }
 
@@ -163,7 +165,7 @@
         font-style: normal;
         font-size: 24px;
         line-height: 1.3em;
-        color: #a32020;
+        color: #03039e;
     }
     .aciwc-paragraph {
         font-size: 0.875rem;
@@ -200,7 +202,7 @@
     .aciwc-title {
         color: white;
         margin-bottom: 0;
-        margin-right: 20px;
+        margin-right: 60px;
     }
 }
 
