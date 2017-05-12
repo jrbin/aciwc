@@ -42,10 +42,15 @@
 }
 
 .aciwc-nav {
+    position: absolute;
+    top: 0;
     height: 70px;
+    width: 100%;
     padding-top: 4px;
     //background-color: #e0301e;
-    background-color: #262654;
+    //background-color: #262654;
+    background-color: #8e7950;
+    opacity: .95;
     color: white;
     font-family: georgia, sans-serif;
     .aciwc-explore {
@@ -61,7 +66,7 @@
 
 .aciwc-hero {
     position: relative;
-    height: 545px;
+    height: 600px;
     background-image: url(/img/55.jpg);
     background-repeat:no-repeat;
     background-position: center center;
@@ -74,6 +79,7 @@
             height: 5px;
             //background-color: #a32020;
             background-color: #7f7f7f;
+            opacity: 0.9;
         }
     }
     .aciwc-legend {
@@ -82,7 +88,7 @@
         font-family: georgia, sans-serif;
         #background-color: #a32020;
         background-color: #7f7f7f;
-        opacity: 0.8;
+        opacity: 0.9;
     }
 }
 
