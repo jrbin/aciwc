@@ -1,18 +1,16 @@
 {% extends "base2.html" %}
 
-{% block title %}留学业务{% endblock %}
-
 {% block content %}
 <div class="aciwc-hero3">
-  <div class="aciwc-bg"></div>
+  <div class="aciwc-bg {% block img1 %}{% endblock %}"></div>
   <div class="aciwc-bottom">
     <div class="container">
-      <h1 class="aciwc-title"><span class="aciwc-text-span">留学业务介绍</span></h1>
+      <h1 class="aciwc-title"><span class="aciwc-text-span">{% block pagetitle %}{% endblock %}</span></h1>
     </div>
   </div>
 </div>
 <div class="aciwc-business-intro">
-  <div class="aciwc-building">
+  <div class="aciwc-building {% block img2 %}{% endblock %}">
   </div>
   <div class="aciwc-intro-line">
     <div class="container">
@@ -28,7 +26,7 @@
         <div class="col-md-4">
           <div class="aciwc-fact">
             <div class="aciwc-yellow"></div>
-            <div class="aciwc-card-bg img-60"></div>
+            <div class="aciwc-card-bg {% block img3 %}{% endblock %}"></div>
             <div class="aciwc-content text-white">
               <h2>01</h2>
               <div>We're a group of professional money planners.</div>
@@ -38,7 +36,7 @@
         <div class="col-md-4">
           <div class="aciwc-fact">
             <div class="aciwc-white"></div>
-            <div class="aciwc-card-bg img-61"></div>
+            <div class="aciwc-card-bg {% block img4 %}{% endblock %}"></div>
             <div class="aciwc-content">
               <h2 class="title-orange">02</h2>
               <div>We're a group of professional money planners.</div>
@@ -48,7 +46,7 @@
         <div class="col-md-4">
           <div class="aciwc-fact">
             <div class="aciwc-white"></div>
-            <div class="aciwc-card-bg img-37"></div>
+            <div class="aciwc-card-bg {% block img5 %}{% endblock %}"></div>
             <div class="aciwc-content">
               <h2 class="title-orange">03</h2>
               <div>We're a group of professional money planners.</div>
@@ -92,7 +90,7 @@
     <div class="row">
       <div class="col-md-6">
         <div class="aciwc card">
-          <img class="card-img-top img-fluid" src="/img/64.jpg" >
+          <img class="card-img-top img-fluid" src="{% block img6 %}{% endblock %}" >
           <div class="card-block">
             <h4 class="card-title">Card title</h4>
             <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
@@ -101,7 +99,7 @@
       </div>
       <div class="col-md-6">
         <div class="aciwc card">
-          <img class="card-img-top img-fluid" src="/img/63.jpg" >
+          <img class="card-img-top img-fluid" src="{% block img7 %}{% endblock %}" >
           <div class="card-block">
             <h4 class="card-title">Card title</h4>
             <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>

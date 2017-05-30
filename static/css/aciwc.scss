@@ -354,11 +354,21 @@
     .aciwc-bg {
         position: absolute;
         top: 0; right: 0; bottom: 0; left: 0;
-        background-image: url(/img/59.jpg);
         background-repeat:no-repeat;
         background-position: center center;
         background-size: cover;
         filter: contrast(70%) sepia(80%);
+        &.img59 {
+            background-image: url(/img/59.jpg);
+        }
+        &.img67 {
+            background-image: url(/img/67.jpg);
+        }
+        &.img72 {
+            background-image: url(/img/72.jpg);
+            background-position: top center;
+            filter: none;
+        }
     }
     .aciwc-bottom {
         position: absolute;
@@ -382,7 +392,6 @@
     .aciwc-building {
         position: absolute;
         top: 0; right: 0; bottom: 0; left: 0;
-        background-image: url(/img/34.jpg);
         background-repeat:no-repeat;
         background-position: center center;
         background-size: cover;
@@ -396,6 +405,15 @@
             width: calc(50% + 175px);
         }
         filter: grayscale(50%) opacity(70%) brightness(60%);
+        &.img34 {
+            background-image: url(/img/34.jpg);
+        }
+        &.img31 {
+            background-image: url(/img/31.jpg);
+        }
+        &.img40 {
+            background-image: url(/img/40.jpg);
+        }
     }
 
 }
@@ -506,15 +524,39 @@
     background-size: cover;
     filter: brightness(80%) opacity(30%);
 
-    &.img-37 {
+    &.img37 {
         background-image: url(/img/37.jpg);
     }
 
-    &.img-60 {
+    &.img60 {
         background-image: url(/img/60.jpg);
     }
 
-    &.img-61 {
+    &.img61 {
         background-image: url(/img/61.jpg);
+    }
+
+    &.img57 {
+        background-image: url(/img/57.jpg);
+    }
+
+    &.img28 {
+        background-image: url(/img/28.jpg);
+    }
+
+    &.img65 {
+        background-image: url(/img/65.jpg);
+    }
+
+    &.img71 {
+        background-image: url(/img/71.jpg);
+    }
+
+    &.img19 {
+        background-image: url(/img/19.jpg);
+    }
+
+    &.img73 {
+        background-image: url(/img/73.jpg);
     }
 }

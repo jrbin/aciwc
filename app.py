@@ -374,8 +374,9 @@ def report():
 
 
 @app.route('/business')
-def business():
-    return render_template('business.html')
+@app.route('/business/<int:idx>')
+def business(idx=1):
+    return render_template('business_%d.html' % idx)
 
 
 if __name__ == "__main__":
