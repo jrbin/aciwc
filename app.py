@@ -379,5 +379,15 @@ def business(idx=1):
     return render_template('business_%d.html' % idx)
 
 
+@app.route('/partner')
+def partner():
+    return render_template('partner.html')
+
+
+@app.route('/about')
+def about():
+    return render_template('about.html')
+
+
 if __name__ == "__main__":
     app.run(debug=True, host='127.0.0.1')
