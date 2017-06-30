@@ -62,7 +62,7 @@ def requires_auth(f):
     return decorated
 
 
-@app.route('/')
+@app.route('/old')
 def root():
     partners = select_partner_all()
     introduction = None
@@ -363,9 +363,10 @@ def test_ip():
     return request.environ.get('HTTP_X_REAL_IP', request.remote_addr)
 
 
-@app.route('/newhome')
+@app.route('/')
 def new_home():
-    return render_template('index2.html')
+    items = select_activity_limit()
+    return render_template('index2.html', items=items)
 
 
 @app.route('/report')

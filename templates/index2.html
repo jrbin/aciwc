@@ -14,8 +14,8 @@
             <div class="aciwc-dropdown" style="display: none">
               <ul class="aciwc-dropdown-list">
                 <li><a href="/business">移民业务</a></li>
-                <li><a href="/business/1">留学业务</a></li>
-                <li><a href="/business/2">投资业务</a></li>
+                <li><a href="/business/2">留学业务</a></li>
+                <li><a href="/business/3">投资业务</a></li>
               </ul>
             </div>
           </li>
@@ -40,7 +40,7 @@
 </div>
 <div class="aciwc-section aciwc-bg-grey">
   <div class="container">
-    <div class="row">
+    <div class="row vertical-margin">
       <div class="col-sm-6">
         <div class="aciwc-featured-block">
           <div class="aciwc-img-wrapper">
@@ -49,7 +49,7 @@
           <div class="aciwc-featured-content">
             <h3>澳洲2017-2018财年预算案出炉</h3>
             <p class="aciwc-subtitle">银行和大学生成最大输家！</p>
-            <div class="aciwc-btn black">点击查看详情</div>
+            <a class="aciwc-btn black" href="/activity/9">点击查看详情</a>
           </div>
         </div>
       </div>
@@ -61,7 +61,7 @@
           <div class="aciwc-featured-content">
             <h3>来澳投资者越来越多</h3>
             <p class="aciwc-subtitle">国内一线城市房价远超悉尼，墨尔本</p>
-            <div class="aciwc-btn black">点击查看详情</div>
+            <a class="aciwc-btn black" href="/activity/10">点击查看详情</a>
           </div>
         </div>
       </div>
@@ -71,8 +71,21 @@
 <div class="pb-3"></div>
 <div class="aciwc-section">
   <div class="container">
-    <h2 class="aciwc-title section-title">团队介绍</h2>
+    <h2 class="aciwc-title section-title">团队博客与新闻</h2>
     <div class="row vertical-margin">
+      {% for item in items %}
+      <div class="col-md-6 col-lg-3">
+        <div class="aciwc-collection-item">
+          <div class="aciwc-img-wrapper" style="background-image: url('{{ item.thumbnail }}')"></div>
+          <div class="aciwc-collection-content">
+            <!--<div class="aciwc-date">04 May, 2017</div>-->
+            <h3 class="aciwc-title"><a href="/activity/{{ item.id }}">{{ item.title }}</a></h3>
+            <p class="aciwc-paragraph">{{ item.html|striptags|truncate(100) }}</p>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+      <!--
       <div class="col-md-6 col-lg-3">
         <div class="aciwc-collection-item">
           <div class="aciwc-img-wrapper">
@@ -116,11 +129,12 @@
           </div>
           <div class="aciwc-collection-content">
             <div class="aciwc-date">11 April, 2017</div>
-            <h3 class="aciwc-title">The fourth industrial revolution: it's not all about machines</h3>
+            <h3 class="aciwc-title">移动互联网创业中，只要创新就不会倒闭吗</h3>
             <p class="aciwc-paragraph">CEO insights blog - Author: Bob Moritz , Chairman, PwC International Ltd.</p>
           </div>
         </div>
       </div>
+      -->
     </div>
   </div>
 </div>
@@ -128,47 +142,25 @@
   <div class="container">
     <h2 class="aciwc-title border section-title noto">相关视频</h2>
     <div class="row vertical-margin">
-      <div class="col-md-6 col-lg-3">
+      <div class="col-md-12 col-lg-6">
         <div class="aciwc-collection-item">
           <div class="aciwc-video-wrapper">
-            <iframe class="aciwc-video" src="https://www.youtube.com/embed/6eJGQUe-6Es?rel=0&amp;showinfo=0" frameborder="0" allowfullscreen></iframe>
+            <iframe class="aciwc-video" src="https://www.youtube.com/embed/t74qypNZ7m8?rel=0&amp;showinfo=0" frameborder="0" allowfullscreen></iframe>
           </div>
           <div class="aciwc-collection-content">
-            <h3 class="aciwc-title">Redrawing the lines: FinTech’s growing influence on Financial Services</h3>
-            <p class="aciwc-paragraph">FinTech is all about innovation, disruption and transformation, and will undoubtedly impact and shape the way financial institutions around the world operate. Explore the key themes of PwC's latest report on FinTech, based on a PwC survey of over 1,300 senior financial services and FinTech executives from 71 countries.</p>
+            <h3 class="aciwc-title">澳大利亚团队集体亮相济南微启动</h3>
+            <p class="aciwc-paragraph">微启动年度盛典，李海亭老师领衔业内顶尖实战大咖，共研「新经济·新智造·新品牌·新零售」。澳大利亚国际微商总会James Han会长，率澳大利亚国际微商总会团队，亮相微启动年度盛典。</p>
           </div>
         </div>
       </div>
-      <div class="col-md-6 col-lg-3">
+      <div class="col-md-12 col-lg-6">
         <div class="aciwc-collection-item">
           <div class="aciwc-video-wrapper">
-            <iframe class="aciwc-video" src="https://www.youtube.com/embed/VihBIzMQjfU?rel=0&amp;showinfo=0" frameborder="0" allowfullscreen></iframe>
+            <iframe class="aciwc-video" src="https://www.youtube.com/embed/q1nsWOkUvwM?rel=0&amp;showinfo=0" frameborder="0" allowfullscreen></iframe>
           </div>
           <div class="aciwc-collection-content">
-            <h3 class="aciwc-title">李佩芳个人演唱会召开新闻发布会</h3>
-            <p class="aciwc-paragraph">PwC uses advanced analytics to help transportation companies predict costly mechanical failures ahead of time, and carry out the repairs needed to avoid service interruptions.</p>
-          </div>
-        </div>
-      </div>
-      <div class="col-md-6 col-lg-3">
-        <div class="aciwc-collection-item">
-          <div class="aciwc-video-wrapper">
-            <iframe class="aciwc-video" src="https://www.youtube.com/embed/D16stWYd2zA?rel=0&amp;showinfo=0" frameborder="0" allowfullscreen></iframe>
-          </div>
-          <div class="aciwc-collection-content">
-            <h3 class="aciwc-title"> Focus on diversity and career progression opportunities</h3>
-            <p class="aciwc-paragraph">Aoife Flood, lead researcher and author on Winning the fight for female talent, shares an overview of the report’s key findings.</p>
-          </div>
-        </div>
-      </div>
-      <div class="col-md-6 col-lg-3">
-        <div class="aciwc-collection-item">
-          <div class="aciwc-video-wrapper">
-            <iframe class="aciwc-video" src="https://www.youtube.com/embed/gVRdLuHPvpQ?rel=0&amp;showinfo=0" frameborder="0" allowfullscreen></iframe>
-          </div>
-          <div class="aciwc-collection-content">
-            <h3 class="aciwc-title">2017 Global investor survey</h3>
-            <p class="aciwc-paragraph">Our 2017 Global Investor Survey compares the views of investment professionals and CEOs on the threats and opportunities facing companies today. The report focuses on globalisation and technology</p>
+            <h3 class="aciwc-title">2016李佩芳演唱会精彩剪辑</h3>
+            <p class="aciwc-paragraph">悉尼著名华人歌者、原广州白云轻歌剧团独唱演员，曾担任中国好声音全澳总决赛、TVBA全球新秀歌唱大赛悉尼赛区、水立方歌唱比赛、澳洲国际少年才艺大赛、新南威尔士MUSE STAR&大专之星Just歌唱大赛等众多歌唱比赛评委的李佩芳老师，作为移民澳洲时代的见证人之一，陪伴了老中青三代共同成长。</p>
           </div>
         </div>
       </div>
@@ -181,24 +173,21 @@
     <div class="row vertical-margin">
       <div class="col-sm-6">
         <div class="aciwc-intro-block">
-          <h3 class="aciwc-title">加入我们</h3>
-          <p class="aciwc-paragraph mb-3">ACIWC is all about you. Whether you’re just starting out or are an experienced professional, your future starts here.</p>
-          <div class="aciwc-btn black">点击查看详情</div>
+          <h3 class="aciwc-title">公司网络</h3>
+          <p class="aciwc-paragraph mb-1">澳大利亚国际微商总会位于悉尼市中心。</p>
+          <p class="aciwc-paragraph mb-1">我们与澳大利亚的房地产、法律、金融、旅游、IT等各行各业的公司均有紧密合作。</p>
+          <p class="aciwc-paragraph mb-1">同时我们也与中国各地的投资者与商务人士有着业务往来。</p>
+          <p class="aciwc-paragraph mb-3">我们致力成为中澳企业之间贸易、投资、资源整合的桥梁。</p>
+          <a class="aciwc-btn black" href="/partner">点击查看详情</a>
         </div>
       </div>
-      <!--
-      <div class="col">
-        <div class="aciwc-intro-block">
-          <h3 class="aciwc-title">Press room</h3>
-          <p class="aciwc-paragraph mb-3">Get to know PwC’s leadership, keep up with our latest news, and find the regional contact person you need.</p>
-          <div class="aciwc-btn black">点击查看详情</div>
-        </div>
-      </div>-->
       <div class="col-sm-6">
         <div class="aciwc-intro-block">
-          <h3 class="aciwc-title">公司分布</h3>
-          <p class="aciwc-paragraph mb-3">Global network. Global access. We have offices around the world. Find us wherever you may need us.</p>
-          <div class="aciwc-btn black">点击查看详情</div>
+          <h3 class="aciwc-title">加入我们</h3>
+          <p class="aciwc-paragraph mb-1">澳大利亚国际微商总会欢迎各行业精英前来合作</p>
+          <p class="aciwc-paragraph mb-1">如您有任何想咨询的业务或者想投资的项目，请发邮件至</p>
+          <p class="aciwc-paragraph mb-1">aciwc@etel.com.au</p>
+          <!--<div class="aciwc-btn black">点击查看详情</div>-->
         </div>
       </div>
     </div>

@@ -16,7 +16,7 @@ metadata = MetaData()
 
 partner = Table(
     'partner', metadata,
-    Column('id', Integer, primary_key=True), 
+    Column('id', Integer, primary_key=True),
     Column('logo_url', String, nullable=False),
     Column('html', String, nullable=False),
     Column('published_time', DateTime, nullable=False, default=datetime.now()),
@@ -112,6 +112,12 @@ def select_activity_all(hidden=False):
     stmt = select([activity])
     if hidden is not None:
         stmt = stmt.where(activity.c.hidden == hidden)
+    return conn.execute(stmt).fetchall()
+
+
+def select_activity_limit(limit=4):
+    conn = engine.connect()
+    stmt = select([activity]).where(activity.c.hidden == False).order_by(activity.c.activity_time.desc()).limit(limit)
     return conn.execute(stmt).fetchall()
 
 

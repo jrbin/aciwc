@@ -7,4 +7,9 @@ $(function() {
 //            $dropdown.hide();
 //        });
     });
+    $('.aciwc-menu-btn').click(function(e) {
+        e.stopPropagation();
+        $('.aciwc-menu').slideToggle();
+        $(this).find('.fa').toggleClass('fa-bars fa-times');
+    });
 })

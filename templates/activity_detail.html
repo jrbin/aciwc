@@ -9,7 +9,7 @@
     <meta name="author" content="junrui">
     <link rel="icon" href="/img/favicon.png">
 
-    <title>活动详情</title>
+    <title>澳大利亚国际微商总会 - 详情</title>
 
     <!-- Bootstrap core CSS -->
     <link rel="stylesheet" href="/css/bootstrap.min.css">
@@ -31,13 +31,13 @@
       <div class="row">
         <div class="col-md-12 col-sm-12">
           <h2 class="detail-title">{{ activity.title }}</h2>
-          <div class="detail-time">活动时间：{{ activity.activity_time.strftime('%Y-%m-%d %H:%M') }}</div>
+          <div class="detail-time">发布时间：{{ activity.activity_time.strftime('%Y-%m-%d %H:%M') }}</div>
           <div class="detail-content">{{ activity.html|safe }}</div>
         </div>
       </div>
       <div class="row">
         <div class="col-md-12 col-sm-12">
-          <a href="/">回到主页</a> <a href="/activity">回到活动列表</a>
+          <a href="/">回到主页</a>
         </div>
       </div>
     </div>
