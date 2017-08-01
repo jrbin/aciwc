@@ -44,11 +44,11 @@
           {% if entity == 'partner' %}
           <form method="POST">
             <textarea class="mce" name="html" hidden></textarea>
-            <img id="logo-img" class="img-responsive" src="{{ item.logo_url }}">
+            <img class="img-responsive logo-img" src="{{ item.logo_url }}">
             <div class="input-group">
-              <input type="text" name="logo_url" class="form-control" placeholder="Logo, 输入图片url或者从本地上传" value="{{ item.logo_url }}" required>
+              <input type="text" name="logo_url" class="form-control logo_url" placeholder="Logo, 输入图片url或者从本地上传" value="{{ item.logo_url }}" required>
               <span class="input-group-btn">
-                <label id="img-upload-label" class="btn btn-default btn-file">选择图片... </label>
+                <label class="btn btn-default btn-file img-upload-label">选择图片... </label>
               </span>
             </div>
             <button class="btn btn-primary">保存</button>
@@ -59,6 +59,13 @@
             <input type="text" name="title" class="form-control" value="{{ item.title }}" placeholder="标题" required>
             <input id="datetimepicker1" type="text" name="activity_time" class="form-control" {% if item is not none %}value="{{ item.activity_time.strftime('%Y-%m-%d %H:%M') }}"{% endif %} placeholder="活动时间" required>
             <textarea class="mce" name="html" hidden></textarea>
+            <img class="img-responsive logo-img" src="{{ item.thumbnail }}">
+            <div class="input-group">
+              <input type="text" name="thumbnail" class="form-control logo_url" placeholder="Thumbnail, 输入图片url或者从本地上传" value="{{ item.thumbnail }}">
+              <span class="input-group-btn">
+                <label class="btn btn-default btn-file img-upload-label">选择图片... </label>
+              </span>
+            </div>
             <button class="btn btn-primary">保存</button>
           </form>
           {% endif %}

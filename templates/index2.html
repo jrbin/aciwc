@@ -3,6 +3,7 @@
 {% block title %}首页{% endblock %}
 
 {% block content %}
+{% set default_imgs = ['/img/39.jpg', '/img/38.jpg', '/img/cq5.png', '/img/cq6.png', '/img/cq7.png', '/img/cq8.png'] %}
 
 <div class="aciwc-hero">
   <div class="aciwc-nav">
@@ -41,6 +42,21 @@
 <div class="aciwc-section aciwc-bg-grey">
   <div class="container">
     <div class="row vertical-margin">
+      {% for item in items[:2] %}
+      <div class="col-sm-6">
+        <div class="aciwc-featured-block">
+          <div class="aciwc-img-wrapper">
+            <img class="img-fluid" src="{{ item.thumbnail if item.thumbnail else default_imgs[loop.index0] }}">
+          </div>
+          <div class="aciwc-featured-content">
+            <h3>{{ item.title }}</h3>
+            <p class="aciwc-subtitle">{{ item.html|striptags|truncate(20) }}</p>
+            <a class="aciwc-btn black" href="/activity/{{ item.id }}">点击查看详情</a>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+      <!--
       <div class="col-sm-6">
         <div class="aciwc-featured-block">
           <div class="aciwc-img-wrapper">
@@ -65,6 +81,7 @@
           </div>
         </div>
       </div>
+      -->
     </div>
   </div>
 </div>
@@ -73,14 +90,14 @@
   <div class="container">
     <h2 class="aciwc-title section-title">团队博客与新闻</h2>
     <div class="row vertical-margin">
-      {% for item in items %}
+      {% for item in items[2:6] %}
       <div class="col-md-6 col-lg-3">
         <div class="aciwc-collection-item">
-          <div class="aciwc-img-wrapper" style="background-image: url('{{ item.thumbnail }}')"></div>
+          <div class="aciwc-img-wrapper" style="background-image: url('{{ item.thumbnail if item.thumbnail else default_imgs[loop.index0+2] }}')"></div>
           <div class="aciwc-collection-content">
             <!--<div class="aciwc-date">04 May, 2017</div>-->
             <h3 class="aciwc-title"><a href="/activity/{{ item.id }}">{{ item.title }}</a></h3>
-            <p class="aciwc-paragraph">{{ item.html|striptags|truncate(100) }}</p>
+            <p class="aciwc-paragraph">{{ item.html|striptags|truncate(120) }}</p>
           </div>
         </div>
       </div>

@@ -24,7 +24,7 @@ $(function () {
         });
     }
 
-    tinymce.init({ 
+    tinymce.init({
         selector:'textarea.mce',
         height: 400,
         menubar: false,
@@ -45,7 +45,7 @@ $(function () {
         ],
         setup: function(editor) {
             editor.addButton('mybutton', {
-                text: 'My Button', 
+                text: 'My Button',
                 icon: false,
                 onclick: function() {
                     editor.windowManager.open({
@@ -69,16 +69,16 @@ $(function () {
         tinymce.triggerSave();
     });
 
-    $('#img-upload-label').on('click', function(e) {
+    $('.img-upload-label').on('click', function(e) {
         $('#img-upload-btn').click();
         upload(function(data) {
-            $('input[name="logo_url"]').val(data);
-            $('input[name="logo_url"]').trigger('change');
+            $('input.logo_url').val(data);
+            $('input.logo_url').trigger('change');
         });
     });
 
-    $('input[name="logo_url"]').on('change', function(e) {
-        $('#logo-img').attr('src', $(this).val());
+    $('input.logo_url').on('change', function(e) {
+        $('.logo-img').attr('src', $(this).val());
     });
 
     $('#datetimepicker1').datetimepicker({

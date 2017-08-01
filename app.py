@@ -10,8 +10,8 @@ from email.header import Header
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 
+import htmlmin
 import requests
-from bs4 import BeautifulSoup
 from dateutil.parser import parse
 from flask import Flask, send_from_directory, render_template, request, \
     redirect, url_for, session, Response
@@ -153,6 +153,7 @@ def edit(entity: str, entity_id: int = None):
     if entity == 'partner':
         logo_url = request.form['logo_url']
         html = request.form['html']
+        html = htmlmin.minify(html, remove_comments=True, remove_empty_space=True)
 
         if entity_id is None:
             insert_partner(logo_url, html)
@@ -161,13 +162,15 @@ def edit(entity: str, entity_id: int = None):
                            dict(logo_url=logo_url, html=html))
 
     if entity == 'activity':
-        title = request.form['title']
+        title = request.form['title'].strip()
         html = request.form['html']
+        html = htmlmin.minify(html, remove_comments=True, remove_empty_space=True)
         activity_time = parse(request.form['activity_time'])
-        soup = BeautifulSoup(html)
-        thumbnail = soup.find('img')
-        if thumbnail is not None:
-            thumbnail = thumbnail['src']
+        thumbnail = request.form['thumbnail'].strip()
+        # soup = BeautifulSoup(html)
+        # thumbnail = soup.find('img')
+        # if thumbnail is not None:
+        #     thumbnail = thumbnail['src']
 
         if entity_id is None:
             insert_activity(title, html, thumbnail, activity_time)
@@ -365,7 +368,7 @@ def test_ip():
 
 @app.route('/')
 def new_home():
-    items = select_activity_limit()
+    items = select_activity_limit(6)
     return render_template('index2.html', items=items)
 
 
