@@ -107,7 +107,7 @@
             {% for activity in items %}
               <tr>
                 <td><a href="/activity/{{ activity.id }}">{{ activity.title }}</a></td>
-                <td>{{ activity.html|striptags|truncate(100) }}</td>
+                <td>{{ activity.html|striptags|truncate(100, True) }}</td>
                 <td>
                   <a href="/edit/activity/{{ activity.id }}" class="btn btn-default">编辑</a>
                   <a href="/toggle/activity/{{ activity.id }}" class="btn btn-default {% if activity.hidden %}btn-warning{% endif %}">

@@ -8,7 +8,7 @@
 <div class="aciwc-hero">
   <div class="aciwc-nav">
     <div class="container">
-      <h5 class="aciwc-explore hidden-sm-down">探索</h5>
+      <h5 class="aciwc-explore d-none d-sm-block">探索</h5>
       <div class="aciwc-nav-wrapper">
         <ul class="aciwc-nav-list">
           <li class="aciwc-nav-item">主要业务 <i class="fa fa-chevron-down" aria-hidden="true"></i>
@@ -28,8 +28,8 @@
   </div>
   <div class="aciwc-bottom">
     <div class="container">
-      <div class="row">
-        <div class="col-12 col-sm-8 offset-sm-2 aciwc-legend">
+      <div class="row justify-content-center">
+        <div class="col-12 col-sm-8 aciwc-legend">
           <h2>澳大利亚国际微商总会</h2>
           <p class="aciwc-subtitle mb-4">2016我们一起走过</p>
           <a class="aciwc-btn white" href="/report">查看详情</a>
@@ -50,7 +50,7 @@
           </div>
           <div class="aciwc-featured-content">
             <h3>{{ item.title }}</h3>
-            <p class="aciwc-subtitle">{{ item.html|striptags|truncate(20) }}</p>
+            <p class="aciwc-subtitle">{{ item.html|striptags|truncate(80, True) }}</p>
             <a class="aciwc-btn black" href="/activity/{{ item.id }}">点击查看详情</a>
           </div>
         </div>
@@ -97,7 +97,7 @@
           <div class="aciwc-collection-content">
             <!--<div class="aciwc-date">04 May, 2017</div>-->
             <h3 class="aciwc-title"><a href="/activity/{{ item.id }}">{{ item.title }}</a></h3>
-            <p class="aciwc-paragraph">{{ item.html|striptags|truncate(120) }}</p>
+            <p class="aciwc-paragraph">{{ item.html|striptags|truncate(120, True) }}</p>
           </div>
         </div>
       </div>

@@ -109,7 +109,7 @@ def insert_activity(title: str, html: str, thumbnail: str, activity_time: str):
 
 def select_activity_all(hidden=False):
     conn = engine.connect()
-    stmt = select([activity])
+    stmt = select([activity]).order_by(activity.c.activity_time.desc())
     if hidden is not None:
         stmt = stmt.where(activity.c.hidden == hidden)
     return conn.execute(stmt).fetchall()

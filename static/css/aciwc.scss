@@ -1,5 +1,3 @@
-@import url(//fonts.googleapis.com/earlyaccess/notosanssc.css);
-
 .aciwc-logo {
     width: 50px;
 }
@@ -158,7 +156,7 @@
     border: 1px solid #ccc;
     .aciwc-img-wrapper {
         position: relative;
-        padding-bottom: 182px;
+        padding-bottom: 220px;
         overflow: hidden;
         margin: -1px;
         border-bottom: 1px solid #ccc;
@@ -641,6 +639,12 @@ a.aciwc-btn, .aciwc-btn {
     padding: 10px 0;
     cursor: default;
     border-top: 2px solid white;
+    border-left: none;
+
+    @media (max-width:767px) {
+        border-top: none;
+        border-left: 2px solid white;
+    }
 
     .aciwc-dropdown-list {
         list-style: none;
@@ -828,4 +832,16 @@ a.aciwc-btn, .aciwc-btn {
         border: 1px solid #ccc;
         border-bottom: none;
     }
+}
+
+.card-block {
+    -webkit-box-flex: 1;
+    -webkit-flex: 1 1 auto;
+    -ms-flex: 1 1 auto;
+    flex: 1 1 auto;
+    padding: 1.25rem;
+}
+
+.aciwc-relative {
+    position: relative;
 }
