@@ -51,7 +51,12 @@
           <div class="aciwc-featured-content">
             <h3>{{ item.title }}</h3>
             <p class="aciwc-subtitle">{{ item.html|striptags|truncate(80, True) }}</p>
-            <a class="aciwc-btn black" href="/activity/{{ item.id }}">点击查看详情</a>
+            {% if item.is_link %}
+              {% set link = item.link %}
+            {% else %}
+              {% set link = '/activity/' ~ item.id %}
+            {% endif %}
+            <a class="aciwc-btn black" href="{{link}}">点击查看详情</a>
           </div>
         </div>
       </div>
@@ -96,7 +101,12 @@
           <div class="aciwc-img-wrapper" style="background-image: url('{{ item.thumbnail if item.thumbnail else default_imgs[loop.index0+2] }}')"></div>
           <div class="aciwc-collection-content">
             <!--<div class="aciwc-date">04 May, 2017</div>-->
-            <h3 class="aciwc-title"><a href="/activity/{{ item.id }}">{{ item.title }}</a></h3>
+            {% if item.is_link %}
+              {% set link = item.link %}
+            {% else %}
+              {% set link = '/activity/' ~ item.id %}
+            {% endif %}
+            <h3 class="aciwc-title"><a href="{{link}}">{{ item.title }}</a></h3>
             <p class="aciwc-paragraph">{{ item.html|striptags|truncate(120, True) }}</p>
           </div>
         </div>
@@ -157,7 +167,7 @@
 </div>
 <div class="aciwc-section">
   <div class="container">
-    <h2 class="aciwc-title border section-title noto">相关视频</h2>
+    <h2 class="aciwc-title aciwc-border section-title noto">相关视频</h2>
     <div class="row vertical-margin">
       <div class="col-md-12 col-lg-6">
         <div class="aciwc-collection-item">

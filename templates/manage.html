@@ -29,16 +29,17 @@
 
   <body>
     <div class="container">
+      <div class="pb-4"></div>
       <div class="row">
         <!--<div class="col-md-8 col-md-offset-2 col-sm-10 col-sm-offset-1">-->
         <div class="col-md-12 col-sm-12">
           <h1>管理平台</h1>
           <ul class="nav nav-tabs">
-            <li role="presentation" class="{% if entity == 'hero' %}active{% endif %}"><a href="/manage/hero">首页滚动图片</a></li>
-            <li role="presentation" class="{% if entity == 'partner' %}active{% endif %}"><a href="/manage/partner">伙伴</a></li>
-            <li role="presentation" class="{% if entity == 'activity' %}active{% endif %}"><a href="/manage/activity">活动</a></li>
-            <li role="presentation" class="{% if entity == 'link' %}active{% endif %}"><a href="/manage/link">友情链接</a></li>
-            <li role="presentation" class="{% if entity == 'email' %}active{% endif %}"><a href="/manage/email">公司邮件</a></li>
+            <li role="presentation" class="nav-item"><a class="nav-link {% if entity == 'hero' %}active{% endif %}" href="/manage/hero">首页滚动图片</a></li>
+            <li role="presentation" class="nav-item"><a class="nav-link {% if entity == 'partner' %}active{% endif %}" href="/manage/partner">伙伴</a></li>
+            <li role="presentation" class="nav-item"><a class="nav-link {% if entity == 'activity' %}active{% endif %}" href="/manage/activity">活动</a></li>
+            <li role="presentation" class="nav-item"><a class="nav-link {% if entity == 'link' %}active{% endif %}" href="/manage/link">友情链接</a></li>
+            <li role="presentation" class="nav-item"><a class="nav-link {% if entity == 'email' %}active{% endif %}" href="/manage/email">公司邮件</a></li>
           </ul>
           {% if entity == 'hero' %}
           <table id="hero-table" class="table table-striped">
@@ -53,7 +54,7 @@
                 <td><img src="{{ hero.image_url }}" class="hero-img"></td>
                 <td>{{ hero.description }}</td>
                 <td class="img-size"></td>
-                <td><a href="/remove/hero/{{ hero.id }}" class="btn btn-default">删除</a></td>
+                <td><a href="/remove/hero/{{ hero.id }}" class="btn btn-outline-secondary btn-sm">删除</a></td>
               </tr>
             {% endfor %}
           </table>
@@ -84,12 +85,12 @@
                 <td><img src="{{ partner.logo_url }}" class="manage-img"></td>
                 <td>{{ partner.html|striptags|truncate(100, True) }}</td>
                 <td>
-                  <a href="/edit/partner/{{ partner.id }}" class="btn btn-default">编辑</a>
+                  <a href="/edit/partner/{{ partner.id }}" class="btn btn-outline-secondary btn-sm">编辑</a>
                   {% if partner.id > 1 %}
-                  <a href="/toggle/partner/{{ partner.id }}" class="btn btn-default {% if partner.hidden %}btn-warning{% endif %}">
+                  <a href="/toggle/partner/{{ partner.id }}" class="btn btn-outline-secondary btn-sm {% if partner.hidden %}btn-warning{% endif %}">
                     {% if partner.hidden %}显示{% else %}隐藏{% endif %}
                   </a>
-                  <a href="/remove/partner/{{ partner.id }}" class="btn btn-default">删除</a>
+                  <a href="/remove/partner/{{ partner.id }}" class="btn btn-outline-secondary btn-sm">删除</a>
                   {% endif %}
                 </td>
               </tr>
@@ -109,11 +110,11 @@
                 <td><a href="/activity/{{ activity.id }}">{{ activity.title }}</a></td>
                 <td>{{ activity.html|striptags|truncate(100, True) }}</td>
                 <td>
-                  <a href="/edit/activity/{{ activity.id }}" class="btn btn-default">编辑</a>
-                  <a href="/toggle/activity/{{ activity.id }}" class="btn btn-default {% if activity.hidden %}btn-warning{% endif %}">
+                  <a href="/edit/activity/{{ activity.id }}" class="btn btn-outline-secondary btn-sm">编辑</a>
+                  <a href="/toggle/activity/{{ activity.id }}" class="btn btn-outline-secondary btn-sm {% if activity.hidden %}btn-warning{% endif %}">
                     {% if activity.hidden %}显示{% else %}隐藏{% endif %}
                   </a>
-                  <a href="/remove/activity/{{ activity.id }}" class="btn btn-default">删除</a>
+                  <a href="/remove/activity/{{ activity.id }}" class="btn btn-outline-secondary btn-sm">删除</a>
                 </td>
               </tr>
             {% endfor %}
@@ -131,7 +132,7 @@
               <tr>
                 <td>{{ link.name }}</td>
                 <td><a href="{{ link.url }}">{{ link.url }}</a></td>
-                <td><a href="/remove/link/{{ link.id }}" class="btn btn-default">删除</a></td>
+                <td><a href="/remove/link/{{ link.id }}" class="btn btn-outline-secondary btn-sm">删除</a></td>
               </tr>
             {% endfor %}
           </table>
