@@ -2,7 +2,7 @@
 .idea
 *.pyc
 *.pyo
-env
+venv
 aciwc.db
 config.yml
 fonts

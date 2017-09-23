@@ -2,7 +2,7 @@
 *.pyc
 *.pyo
 __pycache__
-env
+venv
 *.db
 *.sqlite3
 deploy.sh
